@@ -587,6 +587,7 @@
 <body>
     <div class="toast" id="toast"></div>
 
+
     <div class="header-wrap">
         <h1 class="main-title">📰 本地内容阅读器</h1>
         <div class="header-right">
@@ -598,9 +599,11 @@
         </div>
     </div>
 
+
     <div class="search-wrap">
         <input id="searchInput" type="text" placeholder="🔍 搜索文章标题..." autocomplete="off">
     </div>
+
 
     <div class="tab-wrap">
         <button class="tab-btn active" data-cat="all">全部</button>
@@ -609,6 +612,7 @@
         <button class="tab-btn" data-cat="star">⭐只看收藏</button>
         <button class="tab-btn" data-cat="unread">🔖只看未读</button>
     </div>
+
 
     <div class="tool-wrap">
         <button class="tool-btn" id="refreshBtn">🔄刷新</button>
@@ -623,6 +627,7 @@
         </div>
     </div>
 
+
     <!--浏览历史记录区域-->
     <div class="history-panel" id="historyPanel">
         <div class="history-header">
@@ -631,6 +636,7 @@
         </div>
         <div class="history-items" id="historyItems"></div>
     </div>
+
 
     <div class="container" id="containerWrap">
         <div class="left-sidebar" id="listScrollWrap">
@@ -649,12 +655,15 @@
         </div>
     </div>
 
+
     <div id="backTop">⬆</div>
+
 
     <div class="disclaimer-wrap">
         <h4>免责声明</h4>
         <p>本程序为本地个人学习工具。内部内容为使用者根据公开新闻材料整理，非转载原始新闻。所有外部链接指向第三方网站，本工具不对第三方内容真实性负责。仅供个人学习使用，请勿公网部署。</p>
     </div>
+
 
 <script>
 const weatherInfo = {
@@ -664,53 +673,174 @@ const weatherInfo = {
 };
 document.getElementById("weatherText").innerText = `${weatherInfo.city}｜${weatherInfo.condition}｜${weatherInfo.temp}`;
 
+
 const articleData = [
     {
-        title:"科技新闻示例：新一代芯片发布",
+        title:"阿里通义推出GUI智能体基座模型Qwen-UI-Agent",
         category:"tech",
-        source:"科技媒体",
-        sourceUrl:"https://example.com",
-        pubTime:"2026‑08‑01",
+        source:"千问大模型",
+        sourceUrl:"https://mp.weixin.qq.com/s/xjKcjN2W82eNcb0lSrP6yQ",
+        pubTime:"2026‑08‑21",
         content:`
-<p>新一代处理器正式发布，计算能效相比上代有明显提升。</p>
-<p>在AI推理、多任务并行场景下性能提升显著，面向消费级与工业场景。</p>
-<p>多家厂商已经宣布会在后续产品中搭载该芯片。</p>
+<p>阿里通义近日发布面向真实设备交互场景的GUI智能体基座模型Qwen-UI-Agent，瞄准手机、电脑、网页和深度搜索四大入口。</p>
+<p>模型基于100余台真机和150余款应用采集训练数据，在多项主流评测中成绩领先于GPT、Claude、Gemini等竞品旗舰版本。</p>
+<p>安全设计上，模型对违法请求直接拒绝执行，对涉及支付、删除等敏感操作会主动暂停并向用户确认后再继续。</p>
+<p>该模型还支持GUI与命令行混合动作空间，可在单次决策中批量输出操作，大幅缩短复杂任务的执行步数。</p>
 `
     },
     {
-        title:"AI模型能力持续迭代",
+        title:"OpenAI开源AI Agent底层执行框架Codex Harness",
         category:"tech",
-        source:"科技资讯",
-        sourceUrl:"https://example.com",
-        pubTime:"2026‑08‑05",
+        source:"AI工具集",
+        sourceUrl:"https://ai-bot.cn/codex-harness/",
+        pubTime:"2026‑08‑21",
         content:`
-<p>大模型新版本更新，长文本理解、逻辑推理能力得到优化。</p>
-<p>本地部署版本占用资源进一步下降，普通设备也可以流畅运行。</p>
+<p>OpenAI宣布开源AI Agent底层执行框架Codex Harness，为开发者提供从任务理解到人类审批的完整执行循环。</p>
+<p>框架通过CLI、SDK和app-server三种方式暴露能力，企业可将其嵌入自有产品、运营看板或业务系统。</p>
+<p>核心特性包括沙箱安全执行、原生Human-in-the-Loop审批机制、流式事件传输和模型无关架构，适配多种底层模型。</p>
+<p>在ARC-AGI-3基准上，仅靠优化Harness（不改动模型），GPT-5.6 Sol得分从13.3%跃升至38.3%，同时Token消耗减少六倍。</p>
 `
     },
     {
-        title:"联赛常规赛战况综述",
-        category:"sport",
-        source:"体育媒体",
-        sourceUrl:"https://example.com",
-        pubTime:"2026‑08‑10",
+        title:"商汤开源原生统一多模态大模型SenseNova U1.5 Lite",
+        category:"tech",
+        source:"商汤科技SenseTime",
+        sourceUrl:"https://mp.weixin.qq.com/s/JVFdroJihsHTBDllS0DFCg",
+        pubTime:"2026‑08‑21",
         content:`
-<p>多场焦点比赛结束，积分榜格局发生变化。</p>
-<p>多名年轻选手发挥亮眼，为队伍贡献关键得分。</p>
+<p>商汤科技正式开源轻量级原生统一多模态大模型SenseNova U1.5 Lite，聚焦真实视觉创作流程落地。</p>
+<p>模型原生支持3至4k字符超长复杂指令，突破以往开源模型在指令超过1k字符时易崩溃、遗漏细节的瓶颈。</p>
+<p>能力覆盖原生4K高分辨率输出、原生图像编辑、精细视觉控制及中英文海报级排版，目标从“生成内容”升级到“组织完整视觉表达”。</p>
+<p>模型已在GitHub、Hugging Face和魔搭社区同步开源，开发者可下载部署或在线体验。</p>
 `
     },
     {
-        title:"运动员赛季采访",
-        category:"sport",
-        source:"体育快讯",
-        sourceUrl:"https://example.com",
-        pubTime:"2026‑08‑12",
+        title:"DeepSeek宣布周末API全天按低谷时段计费",
+        category:"tech",
+        source:"AITNT / 机器之心",
+        sourceUrl:"https://www.aitntnews.com/newDetail.html?newId=28522",
+        pubTime:"2026‑08‑23",
         content:`
-<p>运动员谈及训练状态，对接下来的比赛充满信心。</p>
-<p>团队整体磨合越来越好，目标冲击更好成绩。</p>
+<p>DeepSeek自8月23日起调整API峰谷计费规则，周末（周六、周日）全天统一按低谷时段价格收费，不再区分峰谷。</p>
+<p>此前高峰时段API价格最高为低谷的2倍，新规实施后开发者周末跑批量任务的算力成本将显著下降。</p>
+<p>这一调整在开发者社区引发热议，有用户表示一周的活两天干完账单直接减半，但也有打工人担忧公司可能据此调整上班时间，把高耗能任务排到周末执行。</p>
+<p>短剧行业此前已出现类似趋势，多家制作团队为蹭夜间低价算力将渲染任务安排在深夜运行。</p>
+`
+    },
+    {
+        title:"阿里发布Qwen3.8-27B开源模型，多项评测超越Claude Opus 4.6",
+        category:"tech",
+        source:"AITNT",
+        sourceUrl:"https://www.aitntnews.com/newDetail.html?newId=28518",
+        pubTime:"2026‑08‑23",
+        content:`
+<p>阿里巴巴发布Qwen3.8-27B开源大模型，仅270亿参数，采用Apache 2.0协议可免费商用，上线两天下载量突破百万，登顶Hugging Face趋势榜。</p>
+<p>在SWE-bench Pro编程测试中得分61.7分，超过Claude Opus 4.6的53.4分；OSWorld电脑操作测试84.3分领先Opus的72.7分；CoWorkBench办公任务70.7分同样优于68.2分。</p>
+<p>实测显示该模型在前端生成和工程任务中需求理解能力突出，包括Three.js三维场景搭建、Steam网页复刻、UI截图还原等场景中完成度均高于参数量更大的竞品。</p>
+<p>社区已推出超500个量化版本，证明较小参数模型通过后训练优化可在多项实际任务中达到甚至超越更大模型的表现。</p>
+`
+    },
+    {
+        title:"数据交易平台Kled用户突破50万，AI训练催生零工经济",
+        category:"tech",
+        source:"AITNT",
+        sourceUrl:"https://www.aitntnews.com/newDetail.html?newId=28521",
+        pubTime:"2026‑08‑23",
+        content:`
+<p>Kled是一个面向AI公司的数据交易平台，用户可上传照片、视频、文档等数据获取报酬，平台负责内容审核、分类标注和结构化打包后出售给AI企业用于模型训练。</p>
+<p>平台用户已突破50万，日活约20万，日处理文件超300万份，累计融资达1400万美元，创始人Avi Patel年仅22岁。</p>
+<p>与传统数据标注平台不同，Kled解决的是原始训练数据的来源问题，用户更像是分布式的人类传感器，按需采集第一视角操作视频、道路状况、行车记录等数据。</p>
+<p>一名卡车司机通过上传行车记录仪视频月收入最高达8000美元，凸显出自动驾驶和机器人训练对真实物理世界数据的旺盛需求。</p>
+`
+    },
+    {
+        title:"清华与沃顿研究者借助GPT-5.6破解优化领域40年悬案",
+        category:"tech",
+        source:"AITNT",
+        sourceUrl:"https://www.aitntnews.com/newDetail.html?newId=28519",
+        pubTime:"2026‑08‑23",
+        content:`
+<p>清华大学马建豪与宾大沃顿商学院陈宇新合作，利用GPT-5.6 Sol Pro首次证明：梯度下降仅靠设计步长序列存在不可逾越的收敛率下界Ω(T^{-1.9319})，无法达到动量加速的O(1/T²)水平。</p>
+<p>这一结论回答了优化理论界悬而未决40年的问题——纯调步长能否追上Nesterov动量加速，答案是不能。提升收敛速度必须改变算法结构本身。</p>
+<p>核心证明的数学推导主要由GPT-5.6完成，研究者提供研究目标和高层策略（对抗预言机），通过多次交互迭代修正推导瑕疵，最终形成完整证明。</p>
+<p>整套证明通过Lean 4形式化验证，零sorry零admit一步未跳，代码已在GitHub公开，验证链为GPT构造证明、Codex翻译Lean 4、编译器逐行终审三段接力。</p>
+`
+    },
+    {
+        title:"全球首场人机网球赛开战，银河通用机器人对阵名将郑洁",
+        category:"tech",
+        source:"AITNT",
+        sourceUrl:"https://www.aitntnews.com/newDetail.html?newId=28513",
+        pubTime:"2026‑08‑23",
+        content:`
+<p>8月22日第二届世界人形机器人运动会上，银河通用机器人与网球名将郑洁进行了全球首场人机网球对战，机器人独立完成发球、正手、反手等动作，发球时速超100公里。</p>
+<p>比赛中机器人展现了步法移动、底线调动和网前截击能力，摔倒后可自行站起继续比赛，在双打中还能与人类搭档形成前后站位配合。</p>
+<p>支撑这一表现的是银河通用自研具身智能大模型"银河星脑"，首次将大脑层（任务理解与战术决策）和小脑层（全身运动控制）集成在同一模型中，消除了分层架构的信息延迟和断层问题。</p>
+<p>网球对具身智能是极致压力测试，球速超百公里、反应时间仅几百毫秒且每拍物理参数不重复，标志着中国AI从数字世界走向物理世界对抗的完整闭环。</p>
+`
+    },
+    {
+        title:"骑士B计划启动：签换沃特森豪赌未来",
+        category:"sport",
+        source:"网易体育 / 体坛周报",
+        sourceUrl:"https://www.163.com/dy/article/L51IOQJ805299JMD.html",
+        pubTime:"2026‑08‑23",
+        content:`
+<p>错过詹姆斯后，克利夫兰骑士通过五方交易从掘金换回受限制自由球员佩顿·沃特森，给出4年8800万美元合同（末年球员选项含15%交易保证金），外加2031年无保护首轮和2032年次轮签。</p>
+<p>沃特森上赛季打出生涯最佳表现，稳定出任首发后36场场均18分5.4板2.2助攻，三分命中率43.5%，但因腿筋伤势仅高光两个月便赛季报销。</p>
+<p>骑士此前送走施罗德、斯特鲁斯腾挪薪资空间，同时4年2.73亿提前续约米切尔，表明球队在东部竞争加剧的背景下不愿躺平，选择将留给超级巨星的期待转化为对年轻锋线的赌博式投入。</p>
+`
+    },
+    {
+        title:"克莱放弃980万与独行侠买断，将加盟热火联手字母哥",
+        category:"sport",
+        source:"网易体育",
+        sourceUrl:"https://www.163.com/dy/article/L50C7UMK0529BA9O.html",
+        pubTime:"2026‑08‑23",
+        content:`
+<p>克莱·汤普森与达拉斯独行侠达成买断协议，放弃了2026-27赛季1750万美元薪水中的约980万美元，计划度过澄清期后以2年约1300万美元加盟迈阿密热火。</p>
+<p>克莱在独行侠两个赛季因球队伤病满营未能打进季后赛，2025年2月东契奇被交易至湖人后球队彻底进入重建，他坦言在达拉斯深刻体会到世事瞬息万变。</p>
+<p>加盟热火后克莱将联手字母哥和阿德巴约冲击生涯第五冠，两年前他曾因顾虑浓眉出勤问题拒绝湖人，最终选择独行侠，如今转投有望冲冠的热火迎来生涯新篇章。</p>
+`
+    },
+    {
+        title:"欧文陷交易流言，美媒建议火箭4换2追杜欧重聚",
+        category:"sport",
+        source:"网易体育",
+        sourceUrl:"https://www.163.com/dy/article/L50STOQ105299VFU.html",
+        pubTime:"2026‑08‑23",
+        content:`
+<p>凯里·欧文因左膝ACL撕裂赛季报销，预计26-27赛季训练营前完全康复，近期训练状态良好且身材已恢复甚至比受伤前更精瘦，合同还剩两年共约8190万美元（含15%交易保证金）。</p>
+<p>独行侠已决定围绕状元弗拉格重建，队内华盛顿、加福德、克里斯蒂等多位球员陷入流言，猛龙和热火媒体已开始招募欧文。</p>
+<p>美媒建议火箭用范弗利特、泰特加2027年和2029年首轮签换取欧文加2028年次轮签，若交易达成杜兰特与欧文将时隔四年再度联手，但34岁的欧文加38岁的杜兰特能否带领申京、阿门夺冠仍是疑问。</p>
+`
+    },
+    {
+        title:"奥尼尔炮轰NBA球星拒战扣篮大赛：他们太软胆子太小",
+        category:"sport",
+        source:"网易体育 / The Athletic",
+        sourceUrl:"https://www.163.com/dy/article/L50FNDK60529BA9O.html",
+        pubTime:"2026‑08‑23",
+        content:`
+<p>奥尼尔公开炮轰NBA球星不愿参加扣篮大赛，直言"他们就是太软了，胆子太小"，不认同扣篮花样已被穷尽、大牌球星无法创新的常见说法。</p>
+<p>卡特同样反驳"扣篮没有新花样"的论调，表示在Dunkman联赛中看到了扣篮的持续升级，大风车等经典动作被选手演绎到全新高度，坚信扣篮的可能性远未被穷尽。</p>
+<p>三届扣篮大赛冠军麦克朗坦言参赛心理压力极大，理解球星薪资丰厚后对奖金缺乏兴趣、不愿耗费大量时间打磨扣篮技巧，但认可专业选手背后付出的努力。</p>
+`
+    },
+    {
+        title:"快船老板鲍尔默身价断档领跑全NBA，甩开第二名千亿美元",
+        category:"sport",
+        source:"网易体育",
+        sourceUrl:"https://www.163.com/dy/article/L51NU9U00552I3QU.html",
+        pubTime:"2026‑08‑23",
+        content:`
+<p>NBA老板身价排行榜上，快船老板史蒂夫·鲍尔默以超千亿美元身家断档领跑全联盟，远超第二名独行侠老板杜蒙特家族的400亿美元，骑士老板吉尔伯特以293亿美元位列第三。</p>
+<p>前十名还包括灰熊佩拉290亿、掘金克伦克243亿、热火阿里森194亿、火箭费尔蒂塔138亿、76人哈里斯130亿、篮网蔡崇信129亿和老鹰雷斯勒106亿。</p>
+<p>鲍尔默的财富优势之大，使得NBA对伦纳德合同违规事件调查逾年却迟迟未敢开出罚单，而其余20位老板身家总和恐都难以与之比肩，步行者老板赫伯·西蒙自1983年以1100万美元收购球队后至今未变更所有权，为现役持队时间最长老板。</p>
 `
     }
 ];
+
 
 const READ_KEY = "news_reader_read";
 const STAR_KEY = "news_reader_star";
@@ -720,6 +850,7 @@ const THEME_KEY = "news_reader_dark";
 const LAST_ART_KEY = "news_reader_lastart";
 const HISTORY_KEY = "news_reader_history";
 
+
 //toast工具
 const toastDom = document.getElementById("toast");
 function showToast(msg){
@@ -727,6 +858,7 @@ function showToast(msg){
     toastDom.classList.add("show");
     setTimeout(()=>toastDom.classList.remove("show"),2000);
 }
+
 
 function getReadSet(){
     const raw = localStorage.getItem(READ_KEY);
@@ -779,6 +911,7 @@ document.getElementById("clearHistoryAll").onclick = function(){
     showToast("已清空全部浏览历史");
 };
 
+
 function renderHistory(){
     const box = document.getElementById("historyItems");
     const arr = getHistoryList();
@@ -806,6 +939,7 @@ function renderHistory(){
     });
 }
 
+
 // 更新统计信息
 function updateStat(){
     const readSet = getReadSet();
@@ -815,6 +949,7 @@ function updateStat(){
     const starCnt = starSet.size;
     document.getElementById("statBox").innerText = `📊 全部：${total}篇｜已读：${readCnt}篇｜收藏：${starCnt}篇`;
 }
+
 
 //全局字号切换
 const fontBtns = document.querySelectorAll(".font-btn");
@@ -835,6 +970,7 @@ fontBtns.forEach(btn=>{
     }
 });
 
+
 //暗黑模式
 const themeBtn = document.getElementById("themeBtn");
 let darkMode = localStorage.getItem(THEME_KEY) === "1";
@@ -854,6 +990,7 @@ themeBtn.onclick = ()=>{
     applyDark();
 };
 
+
 //专注模式切换
 const focusBtn = document.getElementById("focusModeBtn");
 const leftSideDom = document.getElementById("listScrollWrap");
@@ -870,6 +1007,7 @@ focusBtn.onclick = function(){
         showToast("已退出专注模式");
     }
 };
+
 
 //刷新按钮逻辑，增加loading视觉反馈
 const listLoading = document.getElementById("listLoading");
@@ -894,6 +1032,7 @@ document.getElementById("refreshBtn").onclick = function(){
     //重置列表滚动位置
     listScrollWrap.scrollTop = 0;
 
+
     setTimeout(()=>{
         renderList();
         renderHistory();
@@ -901,6 +1040,7 @@ document.getElementById("refreshBtn").onclick = function(){
     },220);
     showToast("列表已刷新");
 };
+
 
 //清空全部收藏，增加确认弹窗
 document.getElementById("clearAllStar").onclick = function(){
@@ -911,6 +1051,7 @@ document.getElementById("clearAllStar").onclick = function(){
     }
 };
 
+
 //清除全部已读标记，增加确认弹窗
 document.getElementById("clearAllRead").onclick = function(){
     if(window.confirm("确定要清除全部已读标记吗？此操作不可恢复！")){
@@ -920,11 +1061,13 @@ document.getElementById("clearAllRead").onclick = function(){
     }
 };
 
+
 const backTopBtn = document.getElementById("backTop");
 window.addEventListener("scroll",()=>{
     backTopBtn.classList.toggle("show", window.scrollY>300);
 });
 backTopBtn.onclick = ()=> window.scrollTo({top:0, behavior:"smooth"});
+
 
 const listScrollWrap = document.getElementById("listScrollWrap");
 const listBackTopBtn = document.getElementById("listBackTop");
@@ -933,11 +1076,13 @@ listScrollWrap.addEventListener("scroll",()=>{
 });
 listBackTopBtn.onclick = ()=> listScrollWrap.scrollTo({top:0, behavior:"smooth"});
 
+
 const listBox = document.getElementById("listBox");
 const detailBox = document.getElementById("detailBox");
 const searchInput = document.getElementById("searchInput");
 let currentCat = "all";
 let currentArticleId = null;
+
 
 //返回首页
 function goBack(){
@@ -953,6 +1098,7 @@ function goBack(){
     `;
 }
 
+
 //保存阅读滚动位置 & 上次文章
 detailBox.addEventListener("scroll",()=>{
     if(!currentArticleId) return;
@@ -966,6 +1112,7 @@ detailBox.addEventListener("scroll",()=>{
     const bar = document.getElementById("progressBar");
     if(bar) bar.style.width = percent + "%";
 });
+
 
 //通过aid打开文章，用于历史记录恢复
 function openArticleByAid(aid){
@@ -1011,6 +1158,7 @@ function openArticleByAid(aid){
     },20);
     renderList();
 }
+
 
 function renderList(){
     const readSet = getReadSet();
@@ -1064,6 +1212,7 @@ function renderList(){
     });
 }
 
+
 document.querySelectorAll(".tab-btn").forEach(btn=>{
     btn.onclick = ()=>{
         document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
@@ -1094,6 +1243,7 @@ searchInput.oninput = ()=>{
     renderList();
 };
 
+
 document.getElementById("markAllRead").onclick = ()=>{
     if(window.confirm("确定全部标为已读？")){
         const s = getReadSet();
@@ -1104,9 +1254,11 @@ document.getElementById("markAllRead").onclick = ()=>{
     }
 };
 
+
 //初始化
 renderList();
 renderHistory();
+
 
 //页面加载恢复上次阅读文章
 (function restoreLastArticle(){
