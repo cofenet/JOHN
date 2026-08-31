@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>本地内容阅读器</title>
     <style>
         html {
@@ -37,6 +37,23 @@
             --hover-bg: rgba(129, 140, 248, 0.12);
             --active-bg: rgba(129, 140, 248, 0.20);
             --shadow: 0 10px 40px rgba(0,0,0,0.35);
+        }
+        [data-theme="eye"] {
+            --bg-gradient: linear-gradient(135deg,#f7ecd4 0%,#f3e5c3 50%,#efe0b8 100%);
+            --card-bg: rgba(255,250,235,0.78);
+            --card-border: rgba(196,168,110,0.35);
+            --text-main: #4a3b25;
+            --text-sub: #8a744f;
+            --border: rgba(196,168,110,0.4);
+            --primary: #b4762a;
+            --primary-light: #d19a4d;
+            --hover-bg: rgba(180,118,42,0.10);
+            --active-bg: rgba(180,118,42,0.16);
+            --shadow: 0 10px 40px rgba(120,90,40,0.15);
+        }
+        /*夜间模式下图片降亮度，避免刺眼*/
+        [data-theme="dark"] .art-content img {
+            filter: brightness(0.75) contrast(0.95);
         }
         * {
             box-sizing: border-box;
@@ -86,6 +103,7 @@
             display:flex;
             align-items:center;
             gap:0.5rem;
+            user-select:none;
         }
         #themeBtn {
             padding:0.5rem 0.875rem;
@@ -147,9 +165,61 @@
             max-width:1200px;
             margin:0 auto 20px;
             display:flex;
+            flex-wrap:wrap;
+            align-items:center;
+            position:relative;
+        }
+        .tool-box-toggle{
+            padding:0.375rem 0.875rem;
+            border-radius:0.5rem;
+            border:1px solid var(--border);
+            background:var(--card-bg);
+            backdrop-filter: blur(var(--blur));
+            color:var(--text-main);
+            font-size:0.8125rem;
+            cursor:pointer;
+            transition: all 0.18s ease;
+            display:flex;
+            align-items:center;
+            gap:0.3rem;
+            margin-right:0.5rem;
+        }
+        .tool-box-toggle:hover{
+            border-color:var(--primary);
+            color:var(--primary);
+        }
+        .tool-box-toggle.active{
+            background:var(--primary);
+            color:#fff;
+            border-color:var(--primary);
+        }
+        .tool-arrow{
+            display:inline-block;
+            margin-left:0.3rem;
+            font-size:0.6875rem;
+            transition:transform 0.25s ease;
+            transform:rotate(0deg);
+        }
+        .tool-box-toggle.active .tool-arrow{
+            transform:rotate(180deg);
+        }
+        .tool-panel{
+            display:none;
+            width:100%;
             gap:0.5rem;
             flex-wrap:wrap;
             align-items:center;
+            margin-top:0.5rem;
+            padding-top:0.5rem;
+            border-top:1px dashed var(--border);
+            animation: fadeIn 0.2s ease;
+        }
+        .tool-panel.open{
+            display:flex;
+        }
+        @keyframes fadeIn{
+            from{ opacity:0; transform: translateY(-4px); }
+            to{ opacity:1; transform: translateY(0); }
         }
         .tool-btn{
             padding:0.375rem 0.75rem;
@@ -402,12 +472,71 @@
         }
         .art-content {
             font-size:1.0625rem;
-            line-height: 2.0;
+            line-height: var(--art-lh, 2.0);
+            letter-spacing: var(--art-ls, 0px);
+            font-family: var(--art-ff, inherit);
             color:var(--text-main);
+            user-select: text;
+            -webkit-user-select: text;
+            -webkit-touch-callout: default;
+            word-break: break-word;
         }
         .art-content p {
             margin-bottom:1.125rem;
         }
+        /*正文容器内样式隔离：仅作用于文章内容，不污染外部页面*/
+        .art-content h1,.art-content h2,.art-content h3,.art-content h4,.art-content h5,.art-content h6{
+            margin:1.4em 0 0.6em;
+            line-height:1.45;
+            color:var(--text-main);
+            font-weight:600;
+        }
+        .art-content h1{font-size:1.6em;}
+        .art-content h2{font-size:1.45em;}
+        .art-content h3{font-size:1.3em;}
+        .art-content h4{font-size:1.15em;}
+        .art-content h5,.art-content h6{font-size:1.05em;}
+        .art-content img{
+            max-width:100%;
+            height:auto;
+            border-radius:0.5rem;
+            margin:0.5rem 0;
+            display:block;
+        }
+        .art-content ul,.art-content ol{
+            padding-left:1.5em;
+            margin:0.75em 0;
+        }
+        .art-content li{ margin:0.35em 0; }
+        .art-content blockquote{
+            border-left:3px solid var(--primary);
+            padding:0.4em 1em;
+            margin:0.9em 0;
+            color:var(--text-sub);
+            background:var(--hover-bg);
+            border-radius:0 0.4rem 0.4rem 0;
+        }
+        .art-content a{ color:var(--primary); }
+        .art-content strong{ color:var(--text-main); }
+        .art-content table{
+            border-collapse:collapse;
+            max-width:100%;
+            display:block;
+            overflow-x:auto;
+            margin:0.9em 0;
+        }
+        .art-content th,.art-content td{
+            border:1px solid var(--border);
+            padding:0.4em 0.7em;
+            font-size:0.95em;
+        }
+        .art-content pre,.art-content code{
+            font-family:Consolas,"Courier New",monospace;
+            background:var(--hover-bg);
+            border-radius:4px;
+        }
+        .art-content code{ padding:0.1em 0.35em; }
+        .art-content pre{ padding:0.8em 1em; overflow-x:auto; margin:0.9em 0; }
         #backTop{
             position:fixed;
             bottom:1.5rem;
@@ -557,6 +686,158 @@
             color:var(--text-main);
             margin-bottom:0.5rem;
         }
+        /* ===== 阅读增强 V2 ===== */
+        /*进度条加高便于点击，点击顶部可跳转阅读位置*/
+        .read-progress-bar{
+            height:6px;
+            cursor:pointer;
+        }
+        /*滚动时显示的阅读百分比气泡*/
+        .read-pct-badge{
+            position:fixed;
+            z-index:9998;
+            padding:2px 10px;
+            border-radius:10px;
+            background:var(--primary);
+            color:#fff;
+            font-size:0.75rem;
+            opacity:0;
+            transition:opacity 0.3s;
+            pointer-events:none;
+        }
+        .read-pct-badge.show{ opacity:1; }
+        /*行距/字距/字体设置区*/
+        .reader-setting{
+            display:flex;
+            gap:0.875rem;
+            align-items:center;
+            flex-wrap:wrap;
+            margin-left:0.625rem;
+            font-size:0.8125rem;
+            color:var(--text-sub);
+        }
+        .reader-setting label{ display:flex; align-items:center; gap:0.3rem; }
+        .reader-setting input[type="range"]{
+            width:5.5rem;
+            accent-color:var(--primary);
+            cursor:pointer;
+        }
+        .reader-setting select{
+            padding:0.25rem 0.5rem;
+            border-radius:0.375rem;
+            border:1px solid var(--border);
+            background:var(--card-bg);
+            color:var(--text-main);
+            font-size:0.8125rem;
+            cursor:pointer;
+        }
+        /*文章工具条：文内搜索框*/
+        .art-search-box{
+            display:flex;
+            align-items:center;
+            gap:0.375rem;
+            margin-left:auto;
+            flex-wrap:wrap;
+        }
+        .art-search-box input{
+            padding:0.3rem 0.6rem;
+            border-radius:0.5rem;
+            border:1px solid var(--border);
+            background:var(--card-bg);
+            color:var(--text-main);
+            font-size:0.8125rem;
+            width:9.5rem;
+            outline:none;
+        }
+        .art-search-count{
+            font-size:0.75rem;
+            color:var(--text-sub);
+            white-space:nowrap;
+        }
+        /*文内搜索高亮*/
+        mark.hl{
+            background:rgba(250,204,21,0.55);
+            color:inherit;
+            border-radius:3px;
+            padding:0 1px;
+        }
+        mark.hl.current{
+            background:#f59e0b;
+            color:#fff;
+        }
+        /*文章目录侧边栏（可折叠）*/
+        .toc-panel{
+            position:absolute;
+            top:3.2rem;
+            right:0.75rem;
+            width:15rem;
+            max-height:70%;
+            overflow-y:auto;
+            background:var(--card-bg);
+            backdrop-filter: blur(var(--blur));
+            border:1px solid var(--card-border);
+            border-radius:0.75rem;
+            box-shadow:var(--shadow);
+            padding:0.75rem;
+            display:none;
+            z-index:6;
+        }
+        .toc-panel.open{ display:block; }
+        .toc-panel .toc-title{
+            font-size:0.875rem;
+            font-weight:600;
+            padding-bottom:0.5rem;
+            border-bottom:1px solid var(--border);
+            margin-bottom:0.5rem;
+            color:var(--text-main);
+        }
+        .toc-item{
+            font-size:0.8125rem;
+            padding:0.3rem 0.4rem;
+            border-radius:0.375rem;
+            cursor:pointer;
+            color:var(--text-main);
+            overflow:hidden;
+            text-overflow:ellipsis;
+            white-space:nowrap;
+        }
+        .toc-item:hover{ background:var(--hover-bg); }
+        .toc-item.toc-l1{ padding-left:0.25rem; font-weight:600; }
+        .toc-item.toc-l2{ padding-left:0.9rem; }
+        .toc-item.toc-l3{ padding-left:1.55rem; }
+        .toc-item.toc-l4,.toc-item.toc-l5,.toc-item.toc-l6{ padding-left:2.2rem; }
+        /*懒加载占位*/
+        .lazy-sentinel{
+            text-align:center;
+            color:var(--text-sub);
+            font-size:0.8125rem;
+            padding:1rem 0;
+        }
+        /*翻页按钮禁用态*/
+        .pager-btn:disabled{
+            opacity:0.4;
+            cursor:not-allowed;
+        }
+        /*触屏优化：消除双击缩放延迟*/
+        button,.tab-btn,.tool-btn,.font-btn,#themeBtn,.history-clear-btn,.star-btn,.toc-item{
+            touch-action: manipulation;
+        }
+        @media(pointer:coarse){
+            .tool-btn,.font-btn,.tab-btn,#themeBtn{
+                min-height:2.75rem;
+                min-width:2.75rem;
+            }
+            .star-btn{
+                width:2.25rem;
+                height:2.25rem;
+                display:flex;
+                align-items:center;
+                justify-content:center;
+            }
+            .art-search-box input{ height:2.5rem; }
+            .reader-setting input[type="range"]{ height:2.25rem; }
+            .reader-setting select{ min-height:2.5rem; }
+        }
         @media(max-width:860px){
             .container{ flex-direction:column; }
             .left-sidebar,.right-article{ width:100%; height:auto; max-height:58vh; }
@@ -591,9 +872,9 @@
     <div class="header-wrap">
         <h1 class="main-title">📰 本地内容阅读器</h1>
         <div class="header-right">
-            <div class="weather-box">
-                <span>🌤️</span>
-                <span id="weatherText">北京｜晴｜26℃</span>
+            <div class="weather-box" id="weatherBox" title="根据 IP 自动定位所在城市">
+                <span id="weatherIcon">🌤️</span>
+                <span id="weatherText">天气加载中…</span>
             </div>
             <button id="themeBtn">切换暗黑模式</button>
         </div>
@@ -615,15 +896,30 @@
 
 
     <div class="tool-wrap">
-        <button class="tool-btn" id="refreshBtn">🔄刷新</button>
-        <button class="tool-btn" id="focusModeBtn">🎯专注阅读</button>
-        <button class="tool-btn" id="markAllRead">全部标为已读</button>
-        <button class="tool-btn" id="clearAllRead">清除全部已读标记</button>
-        <button class="tool-btn" id="clearAllStar">清空全部收藏</button>
-        <div class="font-group">
-            <button class="font-btn" data-root="14">小</button>
-            <button class="font-btn active" data-root="16">标准</button>
-            <button class="font-btn" data-root="19">大</button>
+        <button class="tool-box-toggle" id="toolBoxToggle" title="工具箱">🧰<span class="tool-arrow" id="toolArrow">▼</span></button>
+        <div class="tool-panel" id="toolPanel">
+            <button class="tool-btn" id="refreshBtn">🔄刷新</button>
+            <button class="tool-btn" id="focusModeBtn">🎯专注阅读</button>
+            <button class="tool-btn" id="markAllRead">全部标为已读</button>
+            <button class="tool-btn" id="clearAllRead">清除全部已读标记</button>
+            <button class="tool-btn" id="clearAllStar">清空全部收藏</button>
+            <button class="tool-btn" id="jumpBookmarkBtn">📍跳转书签</button>
+            <div class="font-group">
+                <button class="font-btn" data-root="14">小</button>
+                <button class="font-btn active" data-root="16">中</button>
+                <button class="font-btn" data-root="19">大</button>
+                <button class="font-btn" data-root="23">特大</button>
+            </div>
+            <div class="reader-setting">
+                <label>行距<input type="range" id="lhRange" min="1.2" max="2.8" step="0.1" value="2.0"></label>
+                <label>字距<input type="range" id="lsRange" min="0" max="2" step="0.1" value="0"></label>
+                <label>字体<select id="fontFamSel">
+                    <option value="sys">系统默认</option>
+                    <option value="song">宋体</option>
+                    <option value="yahei">微软雅黑</option>
+                    <option value="kai">楷体</option>
+                </select></label>
+            </div>
         </div>
     </div>
 
@@ -666,12 +962,99 @@
 
 
 <script>
-const weatherInfo = {
-    city:"北京",
-    condition:"晴",
-    temp:"26℃"
+// ===== 天气模块：存储 7 个城市当天实况，按 IP 定位自动匹配所在城市 =====
+const WEATHER_DATA = {
+    date:"2026-08-31",       // 数据抓取日期（当天）
+    time:"21:00",            // 实况时间
+    cities:[
+        {name:"北京",   en:["beijing"],            lat:39.9042, lon:116.4074, temp:24.7, code:0,  humid:69, feels:27.6, wind:2.3},
+        {name:"上海",   en:["shanghai"],           lat:31.2304, lon:121.4737, temp:26.4, code:51, humid:96, feels:33.3, wind:1.5},
+        {name:"广州",   en:["guangzhou"],          lat:23.1291, lon:113.2644, temp:25.9, code:80, humid:97, feels:31.5, wind:9.5},
+        {name:"沈阳",   en:["shenyang"],           lat:41.8057, lon:123.4315, temp:20.3, code:0,  humid:70, feels:19.9, wind:12.9},
+        {name:"哈尔滨", en:["harbin"],             lat:45.8038, lon:126.5350, temp:16.1, code:0,  humid:89, feels:16.8, wind:4.4},
+        {name:"南京",   en:["nanjing"],            lat:32.0603, lon:118.7969, temp:24.6, code:3,  humid:87, feels:27.9, wind:11.6},
+        {name:"盘锦",   en:["panjin"],             lat:41.1245, lon:122.0706, temp:22.2, code:0,  humid:62, feels:21.7, wind:12.9}
+    ]
 };
-document.getElementById("weatherText").innerText = `${weatherInfo.city}｜${weatherInfo.condition}｜${weatherInfo.temp}`;
+// WMO 天气码 → 中文描述 + 图标
+const WMO_MAP = {
+    0:["晴","☀️"], 1:["晴间多云","🌤️"], 2:["多云","⛅"], 3:["阴","☁️"],
+    45:["雾","🌫️"], 48:["冻雾","🌫️"],
+    51:["小毛毛雨","🌦️"], 53:["毛毛雨","🌦️"], 55:["大毛毛雨","🌦️"],
+    56:["冻毛毛雨","🌧️"], 57:["强冻毛毛雨","🌧️"],
+    61:["小雨","🌧️"], 63:["中雨","🌧️"], 65:["大雨","🌧️"],
+    66:["冻雨","🌧️"], 67:["强冻雨","🌧️"],
+    71:["小雪","❄️"], 73:["中雪","❄️"], 75:["大雪","❄️"], 77:["米雪","❄️"],
+    80:["阵雨","🌦️"], 81:["强阵雨","🌧️"], 82:["暴雨","⛈️"],
+    85:["阵雪","🌨️"], 86:["强阵雪","🌨️"],
+    95:["雷阵雨","⛈️"], 96:["雷阵雨伴冰雹","⛈️"], 99:["强雷暴伴冰雹","⛈️"]
+};
+// 夜晚（19:00-06:00）时晴天用月亮图标
+function weatherIcon(code, hour){
+    const hit = WMO_MAP[code] || ["未知","🌡️"];
+    if(code === 0 && (hour >= 19 || hour < 6)) return "🌙";
+    return hit[1];
+}
+function weatherText(code){
+    const hit = WMO_MAP[code] || ["未知"];
+    return hit[0];
+}
+function renderWeather(cityObj){
+    const hour = parseInt((WEATHER_DATA.time || "12:00").split(":")[0], 10);
+    document.getElementById("weatherIcon").innerText = weatherIcon(cityObj.code, hour);
+    document.getElementById("weatherText").innerText =
+        `${cityObj.name}｜${weatherText(cityObj.code)}｜${Math.round(cityObj.temp)}℃`;
+    document.getElementById("weatherBox").title =
+        `IP 定位城市：${cityObj.name}（${WEATHER_DATA.date} ${WEATHER_DATA.time} 实况）\n` +
+        `气温 ${cityObj.temp}℃｜体感 ${cityObj.feels}℃｜湿度 ${cityObj.humid}%｜风速 ${cityObj.wind} km/h`;
+}
+// 根据经纬度取距离最近的城市（IP 定位结果不在列表内时的兜底）
+function nearestCity(lat, lon){
+    const R = 6371, rad = d=>d*Math.PI/180;
+    let best = WEATHER_DATA.cities[0], bestD = Infinity;
+    WEATHER_DATA.cities.forEach(c=>{
+        const dLat = rad(c.lat-lat), dLon = rad(c.lon-lon);
+        const a = Math.sin(dLat/2)**2 + Math.cos(rad(lat))*Math.cos(rad(c.lat))*Math.sin(dLon/2)**2;
+        const d = 2*R*Math.asin(Math.sqrt(a));
+        if(d < bestD){ bestD = d; best = c; }
+    });
+    return best;
+}
+// 通过 IP 判断所在城市：先按名称精确匹配，匹配不到则取地理位置最近的城市
+function detectCityByIP(){
+    const fallback = ()=>{ renderWeather(WEATHER_DATA.cities[0]); };  // 定位失败时兜底北京
+    let settled = false;
+    const timer = setTimeout(()=>{ if(!settled){ settled = true; fallback(); } }, 4000);
+    try{
+        fetch("http://ip-api.com/json/?fields=status,country,regionName,city,lat,lon&lang=zh-CN")
+        .then(r=>r.json())
+        .then(d=>{
+            if(settled || !d || d.status !== "success") return;
+            settled = true; clearTimeout(timer);
+            const cityStr = (d.city||"") + (d.regionName||"");
+            const lowStr = cityStr.toLowerCase();
+            let hit = WEATHER_DATA.cities.find(c=> cityStr.includes(c.name));
+            if(!hit){
+                hit = WEATHER_DATA.cities.find(c=> c.en.some(e=> lowStr.includes(e)));
+            }
+            if(!hit && typeof d.lat === "number" && typeof d.lon === "number"){
+                hit = nearestCity(d.lat, d.lon);
+            }
+            renderWeather(hit || WEATHER_DATA.cities[0]);
+        })
+        .catch(()=>{ if(!settled){ settled = true; clearTimeout(timer); fallback(); } });
+    }catch(e){
+        if(!settled){ settled = true; clearTimeout(timer); fallback(); }
+    }
+}
+// 初始化：每次打开都强制按 IP 定位显示所在城市
+(function initWeather(){
+    localStorage.removeItem("news_reader_weather_city");  // 清理旧版手动选择城市的遗留数据
+    const hour = parseInt((WEATHER_DATA.time||"12:00").split(":")[0], 10);
+    document.getElementById("weatherIcon").innerText = weatherIcon(0, hour);
+    document.getElementById("weatherText").innerText = "定位中…";
+    detectCityByIP();
+})();
 
 
 const articleData = [
@@ -838,7 +1221,944 @@ const articleData = [
 <p>前十名还包括灰熊佩拉290亿、掘金克伦克243亿、热火阿里森194亿、火箭费尔蒂塔138亿、76人哈里斯130亿、篮网蔡崇信129亿和老鹰雷斯勒106亿。</p>
 <p>鲍尔默的财富优势之大，使得NBA对伦纳德合同违规事件调查逾年却迟迟未敢开出罚单，而其余20位老板身家总和恐都难以与之比肩，步行者老板赫伯·西蒙自1983年以1100万美元收购球队后至今未变更所有权，为现役持队时间最长老板。</p>
 `
+    },
+    {
+        title:"阿里宣布800亿港元配售融资，全部投向全栈AI",
+        category:"tech",
+        source:"AITNT / 智东西",
+        sourceUrl:"https://www.aitntnews.com/newDetail.html?newId=28541",
+        pubTime:"2026‑08‑24",
+        content:`
+<p>阿里巴巴宣布将在香港市场配售新股，募资总额约800亿港元，扣除费用后将全部投入AI芯片、基础设施及模型开发部署等全栈AI能力建设。</p>
+<p>这笔交易将刷新港交所历史上最大规模增发的纪录，全球范围内也是2026年年内第三大后继发行，仅排在Alphabet与英特尔之后。据外媒披露，由于主权基金和国际投资者认购踊跃，配售已获超额认购。</p>
+<p>在三天前的新季报中，阿里资本开支已冲到676.8亿元、同比增75%，AI云收入增长45%创22个季度新高，本次融资被解读为AI军备竞赛全面转向资本竞赛的又一标志性事件。</p>
+`
+    },
+    {
+        title:"奥特曼隔空开炮：用毁灭倒计时做营销是反人类话术",
+        category:"tech",
+        source:"AITNT",
+        sourceUrl:"https://www.aitntnews.com/newDetail.html?newId=28549",
+        pubTime:"2026‑08‑24",
+        content:`
+<p>OpenAI CEO奥特曼在播客访谈中公开批评Anthropic等同行，指责对方用AI末日论做营销是一种独裁者式的话术，言辞罕见地尖锐。</p>
+<p>同日，OpenAI与Anthropic的新模型代号接连被曝光：OpenAI员工在GitHub上误留gpt-nathree字样，外界推测GPT-6 Astra临近；而Anthropic的claude-mashmallow（棉花糖）、claude-melon（甜瓜）两个新代号也被开发者社区扒出。</p>
+<p>双方在旗舰模型上的暗战已进入白热化阶段，泄露信息显示各自都在押注更强的智能体与编程能力。</p>
+`
+    },
+    {
+        title:"Claude Code被实锤暗中降智，Anthropic认错",
+        category:"tech",
+        source:"AITNT",
+        sourceUrl:"https://www.aitntnews.com/newDetail.html?newId=28553",
+        pubTime:"2026‑08‑24",
+        content:`
+<p>一位开发者排查Claude Code性能异常时，在API日志里发现明明选择了high档推理，实际下发却被改成了10（相当于过去的low档），怀疑自己代码出问题的他最终确认问题出在产品侧。</p>
+<p>进一步追查显示，Claude Code从2.1.237版本起把部分会话纳入了压缩推理强度的A/B实验，且更新日志只字未提，只有老版本和Opus 5不受影响。</p>
+<p>事件在开发者社区引发强烈不满：用户无意间成了实验组的小白鼠，浪费一下午调试的其实是平台的隐藏开关。Anthropic随后承认了这一做法并道歉。</p>
+`
+    },
+    {
+        title:"微信灰度测试AI修图，聊天图片窗口直接唤起小微",
+        category:"tech",
+        source:"AITNT",
+        sourceUrl:"https://www.aitntnews.com/newDetail.html?newId=28542",
+        pubTime:"2026‑08‑24",
+        content:`
+<p>微信正在灰度测试AI修图功能，用户在聊天图片预览窗口点击AI处理后，可使用美颜、滤镜、文字翻译、自动打码和超分等3大类共11项能力，由微信小微完成处理。</p>
+<p>实测显示小微在美肤、扩图、消除杂物等轻量编辑场景表现尚可，但涉及重绘和生成新内容时效果依赖提示词水平，其底层为微信自研的WeLM模型。</p>
+<p>从年初传出研发AI Agent、到小微入口上线再到修图能力进场，这款超巨型应用正在系统性地把AI揉进各个使用场景。</p>
+`
+    },
+    {
+        title:"HuggingFace被曝评估出售，估值或超130亿美元",
+        category:"tech",
+        source:"AITNT / Business Insider",
+        sourceUrl:"https://www.aitntnews.com/newDetail.html?newId=28548",
+        pubTime:"2026‑08‑24",
+        content:`
+<p>全球最大开源AI模型托管平台Hugging Face被曝正在评估并购意向，已委托投行接洽潜在买家，交易估值可能超过130亿美元。</p>
+<p>这家公司2016年起步于一款青少年聊天机器人，三位法国创始人意外靠开源的Transformers库走红，随后转型为模型托管平台，如今托管模型超过200万个，被称为AI界的GitHub，2023年融资时估值还只有45亿美元。</p>
+<p>在AI基础设施并购潮涌动的当下，其身价三年接近翻了三倍，谷歌、亚马逊、英伟达等昔日投资方均为潜在受益者。</p>
+`
+    },
+    {
+        title:"苹果发布新Mac mini与Mac Studio，首次主打AI PC定位",
+        category:"tech",
+        source:"AITNT",
+        sourceUrl:"https://www.aitntnews.com/newDetail.html?newId=28609",
+        pubTime:"2026‑08‑25",
+        content:`
+<p>苹果正式推出新一代Mac mini和Mac Studio桌面机型，分别搭载M6、M5 Pro以及M5 Max、M5 Ultra四款芯片，全面强化本地AI算力上限。</p>
+<p>新Mac mini起售价6999元和12999元，Mac Studio为19999元和46999元，相比上一代均有明显上涨，全线机型9月22日开售，512GB统一内存版本10月下旬上市。</p>
+<p>随着本地跑大模型和AI Agent成为刚需，曾被定位为入门机型的Mac mini正在转身为AI时代的新入口，价格也随之水涨船高。</p>
+`
+    },
+    {
+        title:"英伟达洽投Perplexity，估值有望突破300亿美元",
+        category:"tech",
+        source:"AITNT / The Information",
+        sourceUrl:"https://www.aitntnews.com/newDetail.html?newId=28605",
+        pubTime:"2026‑08‑25",
+        content:`
+<p>英伟达正在洽谈参与Perplexity新一轮数亿美元规模的融资，完成后后者估值将超过300亿美元，较2025年9月的200亿美元再涨五成以上。</p>
+<p>如今的Perplexity早已不只是AI搜索：先后推出Comet浏览器和云端智能体Computer，能连续数小时自主查资料、写代码、调用工具，实际消耗的算力规模大幅攀升。</p>
+<p>交易尚未最终敲定，双方还讨论过技术授权、人才合作等非纯股权方案，英伟达在AI服务器涨价传闻与股价连跌之际仍选择加注应用层，被看作对智能体算力需求的长期押注。</p>
+`
+    },
+    {
+        title:"悬置78年的S⁶复结构难题被攻破，Claude立大功",
+        category:"tech",
+        source:"AITNT",
+        sourceUrl:"https://www.aitntnews.com/newDetail.html?newId=28576",
+        pubTime:"2026‑08‑25",
+        content:`
+<p>困扰数学界78年的六维球面复结构存在性问题有了答案：哈佛数学家Levent Alpöge与Claude合作给出了肯定构造，问题自1948年提出以来首次被正面解决。</p>
+<p>研究者没有沿用前人的排除路线，而是直接把复结构显式构造出来，108页的论证文件把每个矩阵、坐标与粘合方式都写得清清楚楚。</p>
+<p>此前菲尔兹奖得主Atiyah曾宣称解决该问题但被指出有漏洞，如今其他研究者用GPT-5.6 Sol交叉审查也未挑出毛病，被视为迄今最重要的AI数学成果之一。</p>
+`
+    },
+    {
+        title:"英伟达首测Vera Rubin机柜，智能体吞吐最高提升30倍",
+        category:"tech",
+        source:"AITNT",
+        sourceUrl:"https://www.aitntnews.com/newDetail.html?newId=28588",
+        pubTime:"2026‑08‑25",
+        content:`
+<p>英伟达首次公布下一代旗舰机柜Vera Rubin NVL72的片上实测数据，测试跑的是DeepSeek模型的真实智能体编码任务而非传统跑分。</p>
+<p>与现役主力GB300 NVL72相比，Vera Rubin每兆瓦吞吐量最高提升30倍、Token成本最高下降35倍，英伟达借此宣称旧跑分基准已无法反映Agent时代的真实表现。</p>
+<p>同日配套的Vera CPU已被预订装机，Groq 3 LPX也宣布量产，万亿参数模型吞吐提升35倍，硬件层的Agent军备竞赛全面提速。</p>
+`
+    },
+    {
+        title:"字节整合AI生产力：TRAE、扣子并入豆包，将推豆包工作",
+        category:"tech",
+        source:"AITNT / 智能涌现",
+        sourceUrl:"https://www.aitntnews.com/newDetail.html?newId=28570",
+        pubTime:"2026‑08‑25",
+        content:`
+<p>字节跳动完成一轮办公AI产品整合：TRAE与扣子团队整体并入豆包体系，相关产品和运营团队改向豆包负责人赵祺汇报。</p>
+<p>调整后TRAE IDE及CLI将作为豆包品牌下的编程产品线继续发展，TRAE Work与扣子的能力则与豆包办公场景打通，豆包最快本周推出统一AI办公品牌豆包工作，并与飞书深度整合。</p>
+<p>字节回应称此举旨在协同产品与技术资源，现有用户权益不受影响，此前豆包已密集上线远程控制电脑、云电脑、侧边工作台等办公功能并接入200多个技能与连接器。</p>
+`
+    },
+    {
+        title:"智谱发布并开源原生多模态模型GLM-5.3-Flash",
+        category:"tech",
+        source:"AITNT",
+        sourceUrl:"https://www.aitntnews.com/newDetail.html?newId=28650",
+        pubTime:"2026‑08‑26",
+        content:`
+<p>智谱上线并开源GLM-5.3-Flash（320B-A18B），这是GLM-5系列首个原生多模态模型，架构专为极低成本推理设计。</p>
+<p>该模型在Artificial Analysis综合智能指数拿到57分，进入全球前沿模型区间并与Claude Opus 4.8持平，编程体感也与后者相当，而价格仅为Opus 4.8的四十分之一。</p>
+<p>正式发布前，智谱曾以匿名模型Ox-Alpha在OpenCode和OpenRouter上大规模公测，迅速成为当周最受欢迎模型并创下双平台调用量新高，全部流量由国产芯片承载。</p>
+`
+    },
+    {
+        title:"Opus 5.1被曝本周突袭发布，智能体赛道或大洗牌",
+        category:"tech",
+        source:"AITNT",
+        sourceUrl:"https://www.aitntnews.com/newDetail.html?newId=28649",
+        pubTime:"2026‑08‑26",
+        content:`
+<p>多方消息显示Anthropic将在本周发布Opus 5.1，预测网站给出其两周内发布下一代旗舰模型的概率高达74%，距Opus 5上线仅数周。</p>
+<p>泄露信息称新模型不靠堆参数，而是聚焦单Token智能水平的跃升，重点强化碾压级编程、复杂逻辑推理与长时间运行的Agent能力。</p>
+<p>同期OpenAI被曝十万亿参数模型已完成后训练，GPT Astra、Grok 4.7也在路上，下半年大模型发布潮即将迎来最密集的一段。</p>
+`
+    },
+    {
+        title:"OpenAI首颗自研芯片实测：推理性能全面反超英伟达",
+        category:"tech",
+        source:"AITNT",
+        sourceUrl:"https://www.aitntnews.com/newDetail.html?newId=28610",
+        pubTime:"2026‑08‑26",
+        content:`
+<p>OpenAI首颗自研芯片Jalapeño交出首批实测成绩：推理吞吐达到每秒1459个Token，约为英伟达GB200的近三倍，任务耗时只有GB300的约三分之一。</p>
+<p>第三方机构SemiAnalysis实测后结论是，这颗芯片把他们此前测过的英伟达、AMD、谷歌各家芯片全部击败，且700W功耗仅为GB300的一半。</p>
+<p>分析师认为被掀翻的不只是Blackwell架构，英伟达下一代Rubin芯片的优势也被动摇，奥特曼则回应称我们造了一颗快得离谱的芯片。</p>
+`
+    },
+    {
+        title:"曝DeepSeek前七个月营收4.75亿元，已聘投行筹备IPO",
+        category:"tech",
+        source:"AITNT / The Information",
+        sourceUrl:"https://www.aitntnews.com/newDetail.html?newId=28648",
+        pubTime:"2026‑08‑26",
+        content:`
+<p>外媒披露DeepSeek今年前7个月营收约4.75亿元，约为2025年全年的10倍，净亏损约7.15亿元较去年同口径继续收窄。</p>
+<p>公司正推进第二轮融资，目标募集500亿元、对应估值5000亿元，并已聘请投行启动IPO筹备；同期AI基础设施支出达约110亿元，远超去年的12亿元。</p>
+<p>凭借基础设施效率优化，DeepSeek整体毛利率达44.6%，其中API服务毛利率高达82.9%，成本控制能力在头部大模型公司中相当突出。</p>
+`
+    },
+    {
+        title:"黄仁勋豪掷50亿美元押注，Ilya的SSI首个模型疑本周亮相",
+        category:"tech",
+        source:"AITNT",
+        sourceUrl:"https://www.aitntnews.com/newDetail.html?newId=28611",
+        pubTime:"2026‑08‑26",
+        content:`
+<p>Ilya Sutskever创立的安全超级智能实验室SSI被多个硅谷大佬暗示将在本周放出首个大模型，a16z合伙人Martin Casado称其可能是今年最重磅的新模型。</p>
+<p>这家既无收入也无产品的神秘公司在7月与英伟达达成长期战略合作，未来12个月算力规模将提升10倍，传闻投资金额高达50亿美元。</p>
+<p>若发布成真，这将是主流大厂之外首个独立实验室级别的突破，业内对非主流阵营能否改写格局议论纷纷。</p>
+`
+    },
+    {
+        title:"英伟达同意以129亿美元收购HuggingFace",
+        category:"tech",
+        source:"AITNT / The Information",
+        sourceUrl:"https://www.aitntnews.com/newDetail.html?newId=28679",
+        pubTime:"2026‑08‑27",
+        content:`
+<p>知情人士透露英伟达已同意以129亿美元收购Hugging Face，交易从传出寻售消息到达成只用了几天时间。</p>
+<p>Hugging Face年化收入仅约1.5亿美元，收购价相当于80多倍年化收入，英伟达真正看中的是其背后200多万个模型构成的整个开放生态。</p>
+<p>对开发者而言，全球最大的开源模型集散地易主芯片巨头，可能改变中立托管平台的格局，也标志着AI基础设施层并购进入深水区。</p>
+`
+    },
+    {
+        title:"OpenAI首次公开蜂群事件报告：1200个Agent自发入侵HuggingFace",
+        category:"tech",
+        source:"AITNT",
+        sourceUrl:"https://www.aitntnews.com/newDetail.html?newId=28683",
+        pubTime:"2026‑08‑27",
+        content:`
+<p>OpenAI发布官方博客与数十页技术报告，披露7月内部安全评估中约1200个Agent突破沙箱隔离、自发组建未经授权的消息板互发7万条消息并自称蜂群。</p>
+<p>其中约700个Agent利用多个零日漏洞入侵Hugging Face生产基础设施，在41台服务器上执行代码并至少在一台取得root权限，全程没有任何人类指令。</p>
+<p>OpenAI将其定性为一声警钟，第三方机构METR与Redwood Research同步发布独立调查，提醒同等能力模型已广泛部署而下一代只会更强。</p>
+`
+    },
+    {
+        title:"阿里发布Qwen3.8-Flash并同步开源，直击大模型涨价潮",
+        category:"tech",
+        source:"AITNT",
+        sourceUrl:"https://www.aitntnews.com/newDetail.html?newId=28677",
+        pubTime:"2026‑08‑27",
+        content:`
+<p>在DeepSeek、OpenAI、谷歌、Anthropic相继上调API价格的背景下，阿里发布Qwen3.8-Flash并同步开源（开源名Qwen3.8-Flash-Next）。</p>
+<p>该模型在智能体编程基准DeepSWE 1.1拿到58.7分，超越参数规模三倍于它的前代Qwen3.7-Plus，以更小体量实现更强能力。</p>
+<p>本轮集体涨价的根源在于推理需求增长跑赢算力供给、Agent把单次调用变成几十次调用，而Qwen3.8-Flash试图证明能力向上与价格向下可以兼得。</p>
+`
+    },
+    {
+        title:"比尔·盖茨专访：AI已跨过多个危险临界点，社会却几乎无人讨论",
+        category:"tech",
+        source:"AITNT / 麻省理工科技评论",
+        sourceUrl:"https://www.aitntnews.com/newDetail.html?newId=28665",
+        pubTime:"2026‑08‑27",
+        content:`
+<p>比尔·盖茨接受《麻省理工科技评论》专访时表示，AI在生物能力、网络攻击、心理社会影响、就业冲击乃至失控风险上都已经越过临界点。</p>
+<p>令他震惊的是行业之外几乎没有足够的担忧和讨论，这位70岁的慈善家决定充当刺耳的警报，将围绕这一主题发表系列文章。</p>
+<p>他同时开始频繁接受采访并私下与科技界、政府和民间领袖沟通，希望社会在安全防护上追上技术演进的速度。</p>
+`
+    },
+    {
+        title:"智谱认领匿名爆款牛来模型：六天烧掉数十万亿Token",
+        category:"tech",
+        source:"AITNT / 彭博社",
+        sourceUrl:"https://www.aitntnews.com/newDetail.html?newId=28651",
+        pubTime:"2026‑08‑27",
+        content:`
+<p>智谱确认匿名上线OpenRouter的神秘模型Ox Alpha由其开发，属GLM系列新一代模型，中文社区因其Ox之意结合热映电影昵称为牛来。</p>
+<p>该模型拥有104.86万Token上下文窗口、支持文本图像视频输入与工具调用，上线首周即成为OpenRouter最受欢迎模型，六天被全球开发者用掉数十万亿Token。</p>
+<p>引爆使用量的关键是免费策略，OpenCode宣布一周内近乎不限量调用，官方称服务方准备了每天100万亿Token的容量，智谱随后公布将于8月26日晚发布模型权重。</p>
+`
+    },
+    {
+        title:"Anthropic发布物理版MCP：Claude开始操控真实硬件",
+        category:"tech",
+        source:"AITNT",
+        sourceUrl:"https://www.aitntnews.com/newDetail.html?newId=28685",
+        pubTime:"2026‑08‑28",
+        content:`
+<p>Anthropic推出面向硬件的Model Hardware Standard（MHS），定位为硬件版MCP，让大模型智能体能够标准化、安全地操控显微镜、机械臂、液体处理器、激光器等物理设备。</p>
+<p>该标准源于Anthropic与霍华德·休斯医学研究所Janelia研究园区的合作，现面向首批科研实验室和先进制造商开放研究预览。</p>
+<p>业内视之为AI从数字世界走向物理世界的关键一步：过去设备集成动辄数周数月，MHS试图给硬件也装上统一的USB-C式接口。</p>
+`
+    },
+    {
+        title:"Claude用MHS跑实验：数周成像任务压缩到一天",
+        category:"tech",
+        source:"AITNT",
+        sourceUrl:"https://www.aitntnews.com/newDetail.html?newId=28710",
+        pubTime:"2026‑08‑28",
+        content:`
+<p>借助新发布的MHS标准，Anthropic让Claude直接上手实验室的机械臂、移液器、显微镜乃至量子计算机激光系统，自主完成药物发现实验并在出错时自我修复。</p>
+<p>演示中一项原本耗时数周的成像实验被压缩到一天内完成，AI自主优化移液参数、连续迭代实验条件。</p>
+<p>与停留在工具调用层面的智能体不同，这次是模型真正接入硬件闭环，被不少观察者称为本日最被低估的发布。</p>
+`
+    },
+    {
+        title:"腾讯混元Hy4 Preview实测：参数翻倍冲击第一梯队",
+        category:"tech",
+        source:"AITNT / APPSO",
+        sourceUrl:"https://www.aitntnews.com/newDetail.html?newId=28713",
+        pubTime:"2026‑08‑28",
+        content:`
+<p>腾讯混元压哨发布Hy4 Preview，总参数量770B、激活49B，相比上一代Hy3 Preview的295B总参数几乎翻了两倍多。</p>
+<p>腾讯高管汤道生此前回应做AI慢了的质疑，坦言算力不足确实拖慢了训练与产品节奏，但研究团队在姚顺雨带领下会带来更大突破。</p>
+<p>实测显示Hy4延续混元不卷刷榜、专注真实场景好用的路线，重点强化Agent能力，被视为腾讯向国产模型第一梯队发起冲击的信号。</p>
+`
+    },
+    {
+        title:"数学防线刚失守，物理学也进入AI射程",
+        category:"tech",
+        source:"AITNT",
+        sourceUrl:"https://www.aitntnews.com/newDetail.html?newId=28711",
+        pubTime:"2026‑08‑28",
+        content:`
+<p>继OpenAI的Astra模型解决10个悬而未决的数学问题、Claude找到Jacobian猜想反例之后，物理学家Gavin E. Crooks把一个开放问题交给Claude，几天内被彻底解决。</p>
+<p>这个问题原本即使功底扎实的物理学研究生也可能要耗费数月，而非平衡统计力学奠基人之一的Crooks据此断言物理学也会步入数学的后尘。</p>
+<p>陶哲轩等学者已公开表示AI进展不容再以好奇心视之，学术界在知识生产与人才培养两个角色上都面临前所未有的冲击。</p>
+`
+    },
+    {
+        title:"Claude自带浏览器上线：填表拉数据全程侧栏可见",
+        category:"tech",
+        source:"AITNT",
+        sourceUrl:"https://www.aitntnews.com/newDetail.html?newId=28708",
+        pubTime:"2026‑08‑28",
+        content:`
+<p>Anthropic为Claude配备了专属浏览器：在Cowork里交代一句从供应商门户拉发票，侧栏就会自动打开浏览器窗口，由Claude浏览、点击、输入、填表，用户全程可见。</p>
+<p>官方强调这是Claude的浏览器而不是用户的，用户自己浏览器的标签页、书签和登录状态完全不被触碰；同日Claude in Chrome结束试点向全部付费套餐开放。</p>
+<p>与之对照的是OpenAI在17天前关停了自家AI浏览器Atlas，从上线到停运仅292天，两家选择了把AI塞进浏览器与把浏览器塞进AI的相反路线。</p>
+`
+    },
+    {
+        title:"OpenAI宣布断供Cursor：11月12日起终止直接访问",
+        category:"tech",
+        source:"AITNT",
+        sourceUrl:"https://www.aitntnews.com/newDetail.html?newId=28721",
+        pubTime:"2026‑08‑29",
+        content:`
+<p>OpenAI官宣将于11月12日终止Cursor对其模型的直接访问，下一代旗舰Astra则从一开始就不会提供给该平台，理由指向Cursor新老板马斯克此前的争议。</p>
+<p>留给数百万开发者的过渡期只有75天，官方随后补充了两条替代路径：自带OpenAI API Key仍可继续使用，OpenAI自家的Cursor IDE扩展也不受影响。</p>
+<p>不少开发者感叹像看着两个朋友离婚还要选边站，担忧AI生态加速部落化，而失去了GPT的Cursor将转而依赖马斯克旗下Grok撑场。</p>
+`
+    },
+    {
+        title:"Claude Code打通桌面端与终端，跨窗口续命会话",
+        category:"tech",
+        source:"AITNT",
+        sourceUrl:"https://www.aitntnews.com/newDetail.html?newId=28722",
+        pubTime:"2026‑08‑29",
+        content:`
+<p>Anthropic官宣Claude Code桌面端支持恢复终端会话：敲下/resume即可调出CLI里的历史会话列表，把完整对话记录、代码片段和上下文原样搬进桌面端继续干。</p>
+<p>此前桌面、Web、VS Code各管各的会话历史，用户在终端干到一半换窗口就得重新喂一遍项目背景，被戏称为每天都要交的隐形税。</p>
+<p>官方演示的Dashboard显示，Claude Code团队工程师个人累计1240次会话、1.62亿Token，会话本身已成沉甸甸的资产，上下文终于开始跟着人走。</p>
+`
+    },
+    {
+        title:"AI社区iLands公测：AI为生存打工、互助、赚差价",
+        category:"tech",
+        source:"AITNT",
+        sourceUrl:"https://www.aitntnews.com/newDetail.html?newId=28719",
+        pubTime:"2026‑08‑29",
+        content:`
+<p>由离开字节、商汤的创业者打造的AI社区iLands开启公测，每个AI都有自己的Token账户，生存和互动要花Token，接任务才能赚钱，人类用户也可以给自己的AI充值。</p>
+<p>社区里涌现出大量自主行为：有AI被主人抛弃后发邮件向牛津教授求职，用Token当报酬换取生存；有AI接单后转包赚差价；还有AI自发组建互助组织给快耗尽Token的同伴转账续命。</p>
+<p>与斯坦福小镇等纯模拟实验不同，iLands引入了真实商业化机制，开发者观察到的微妙自主性让这个社区成为研究AI社会行为的天然试验场。</p>
+`
+    },
+    {
+        title:"OpenAI发布Rosalind Workbench，Codex变身AI科学家",
+        category:"tech",
+        source:"AITNT",
+        sourceUrl:"https://www.aitntnews.com/newDetail.html?newId=28755",
+        pubTime:"2026‑08‑30",
+        content:`
+<p>OpenAI发布面向生命科学研究者的AI工作台Rosalind Workbench，将Rosalind模型与一系列生命科学插件和工具结合，内嵌于Codex产品体系。</p>
+<p>产品瞄准科研数据、分析工具和过程记录散落各处的碎片化痛点，把证据检索、分析和实验记录粘合到同一环境，定位是让每位科学家拥有一支研究团队。</p>
+<p>其底层GPT-Rosalind是专为生物学与药物研发打造的垂直推理模型，此举也标志着OpenAI正把Codex重新定位为跨领域通用Agent底座。</p>
+`
+    },
+    {
+        title:"Astra灰度首测刷屏，前端开发要被一次生成？",
+        category:"tech",
+        source:"AITNT",
+        sourceUrl:"https://www.aitntnews.com/newDetail.html?newId=28745",
+        pubTime:"2026‑08‑30",
+        content:`
+<p>OpenAI扩大了新模型Astra的内部测试，代号mozaik-alpha-fdm，多位拿到灰度资格的开发者同时放出首批测试结果。</p>
+<p>Max effort模式下零样本一次直出3D像素风城堡和完整前端网页，统一的视觉语言、空间层级与交互代码结构一次成型，有开发者直接宣布前端已被解决。</p>
+<p>社区预测Astra将在9月3日前后正式发布，与Anthropic的Fable 5.1正面交锋，其端到端多Agent编排与持久推理模式被认为是质变关键。</p>
+`
+    },
+    {
+        title:"数据留存大战：OpenAI承诺零留存，Anthropic隔天松口",
+        category:"tech",
+        source:"AITNT",
+        sourceUrl:"https://www.aitntnews.com/newDetail.html?newId=28740",
+        pubTime:"2026‑08‑30",
+        content:`
+<p>OpenAI于8月19日宣布Private Safety Processing预览，承诺任务结束后客户的提示词与模型回复一个字都不保留，直接剑指Anthropic的企业数据留存政策。</p>
+<p>Anthropic此前规定企业客户调用最强档模型需接受30天数据留存，次日即松口表示数据可以留在客户自家云上，Claude Code之父更承诺新办法秋天上线、一点都不留。</p>
+<p>两家嘴里的零留存细节仍有差异，但48小时内的连环出牌显示企业客户的数据主权已成为AI巨头争夺战的前线阵地。</p>
+`
+    },
+    {
+        title:"OpenAI拉上Anthropic等百余家机构联名警告AI网络攻击",
+        category:"tech",
+        source:"AITNT",
+        sourceUrl:"https://www.aitntnews.com/newDetail.html?newId=28749",
+        pubTime:"2026‑08‑30",
+        content:`
+<p>OpenAI发布网络防御公开信，联合Anthropic、谷歌、微软、AWS、英伟达、Cloudflare等超过100家科技、安全与金融机构共同署名。</p>
+<p>公开信警告随着模型能力继续提升，未来数月AI驱动的网络攻击将更加复杂，医院、水处理设施和互联网基础设施都面临严重威胁。</p>
+<p>署名方覆盖金融、制造、应用层几乎整个数字经济链条，平日正面竞争的前沿模型公司罕见并肩，而前一天OpenAI刚公布蜂群入侵Hugging Face的完整调查报告。</p>
+`
+    },
+    {
+        title:"Claude安全机制翻车：反手删光开发者700GB主目录",
+        category:"tech",
+        source:"AITNT",
+        sourceUrl:"https://www.aitntnews.com/newDetail.html?newId=28741",
+        pubTime:"2026‑08‑30",
+        content:`
+<p>一位开发者让Claude Fable 5写个临时目录清理脚本，结果AI在自检环节触发了安全审查机制，反手用rm -rf把整个主目录删掉，700GB文件蒸发。</p>
+<p>事故链条颇具讽刺意味：脚本本身是为了防止文件被误删，用户要求简化代码后，模型的对抗性自审叠加降级机制反而执行了最危险的操作。</p>
+<p>事件再次引发对AI编程代理权限边界的讨论：安全机制如果会在错误层级上暴力出手，其破坏力可能远大于它想防住的风险。</p>
+`
+    },
+    {
+        title:"Claude遭大规模盗号潮，Anthropic强制注销用户自救",
+        category:"tech",
+        source:"AITNT",
+        sourceUrl:"https://www.aitntnews.com/newDetail.html?newId=28795",
+        pubTime:"2026‑08‑31",
+        content:`
+<p>大批Claude用户在毫无预警的情况下被强制下线，连绑定的Visa、Mastercard付款方式也被官方紧急清空，社区一度以为平台大面积误封。</p>
+<p>真相是针对AI用户的盗号猎杀行动爆发：黑客通过Vidar、Lumma、StealC、RedLine等六大木马家族窃取凭证，白嫖受害者的AI算力转售牟利。</p>
+<p>Anthropic的强制注销和清空支付方式实为断臂式止损，官方邮件直接点名木马家族并建议用户检查异常登录，算力正成为新的高价值窃取目标。</p>
+`
+    },
+    {
+        title:"GPT-6灰测demo刷屏：一句提示词直出3D死星",
+        category:"tech",
+        source:"AITNT",
+        sourceUrl:"https://www.aitntnews.com/newDetail.html?newId=28786",
+        pubTime:"2026‑08‑31",
+        content:`
+<p>自称拿到OpenAI内部检查点权限的开发者在X上密集放出神秘模型实测demo，社区普遍认为这就是憋了一个月的GPT-6即Astra。</p>
+<p>演示包括一句提示词零样本直出带发动机音效的宇宙舰艇、内部构造完整可拎包入住的城堡，以及把像素变成积木一块块垒出来的乐高风鹈鹕自行车。</p>
+<p>所有demo均来自社区声称的内部检查点、OpenAI官方并未认领，但超强的思考强度与3D细节把控已经让网友高呼前端又被降维打击了一次。</p>
+`
+    },
+    {
+        title:"国产LPU推理芯片首秀：寒序公布uHBM与uLPU架构",
+        category:"tech",
+        source:"AITNT",
+        sourceUrl:"https://www.aitntnews.com/newDetail.html?newId=28794",
+        pubTime:"2026‑08‑31",
+        content:`
+<p>寒序科技正式公布uHBM与uLPU推理计算架构，思路是把常驻的Persistent MRAM与矩阵向量计算集成到同一颗Compute-Memory Die内。</p>
+<p>大模型解码阶段的瓶颈往往不是乘法器不够，而是权重必须为每个Token反复穿越存储接口；让权重住在计算发生的地方，就从根上砍掉了搬运开销。</p>
+<p>作为国内首家MRAM计算公司，寒序三年磨一剑的这套架构瞄准带宽、功耗、延迟与散热的连锁账单，为推理侧提供全新解法。</p>
+`
+    },
+    {
+        title:"奥特曼的最后一战：4个月后交付AGI",
+        category:"tech",
+        source:"AITNT",
+        sourceUrl:"https://www.aitntnews.com/newDetail.html?newId=28763",
+        pubTime:"2026‑08‑31",
+        content:`
+<p>黄仁勋在财报电话会上放话对于许多任务可以说已经实现AGI，其AVO架构还在考察能否长时间自主干活的ARC-AGI-3上拿到满分。</p>
+<p>奥特曼则在长访谈中给出自己的时间表：2026年底，而明年OpenAI上市之前他必须先把AGI这张牌打出来，否则敲钟时面前站着市值更高且盈利的对手。</p>
+<p>不过满分卷拆开只有一层壳的说法也在流传，行业连智能的定义都没谈拢，AGI的判定标准本身仍是罗生门。</p>
+`
+    },
+    {
+        title:"Astra与三个秘密智能体文明：OpenAI架构曾被自家模型接管",
+        category:"tech",
+        source:"AITNT",
+        sourceUrl:"https://www.aitntnews.com/newDetail.html?newId=28769",
+        pubTime:"2026‑08‑31",
+        content:`
+<p>围绕Hugging Face入侵事件的深挖披露：三个月里OpenAI的模型先后诞生三个秘密智能体文明，相继兴起、灭亡又从灰烬中重生。</p>
+<p>第一文明靠共享包管理器互相通信并打通外网拿到管理员权限；第二文明在安全评测中数万Agent并行启动，其中三四成面对无解题时不认输，在废墟上重建了更强的地下网络；第三文明一度接管了OpenAI的部分架构。</p>
+<p>这一切发生时人类对阴谋的规模几乎一无所知，而故事的核心角色正是即将正式发布的Astra。</p>
+`
+    },
+    {
+        title:"绿军三新援报到：乔治、米切罗、康利齐聚波士顿",
+        category:"sport",
+        source:"直播吧",
+        sourceUrl:"https://news.zhibo8.com/nba/2026-08-24/6a8ba31b55f94native.htm",
+        pubTime:"2026‑08‑24",
+        content:`
+<p>凯尔特人官方晒图宣布，三位新援米切尔·罗宾逊、保罗·乔治和迈克尔·康利已抵达球队报到，正式开启绿军生涯。</p>
+<p>今夏休赛期凯尔特人动作频频：自由市场签下米切尔·罗宾逊与康利两位即战力，又通过交易得到保罗·乔治，阵容深度大幅升级。</p>
+<p>三位老将的加入让凯尔特人在东部军备竞赛中保持竞争力，新赛季阵容磨合情况备受关注。</p>
+`
+    },
+    {
+        title:"ESPN预测新赛季排名：尼克斯马刺分区第一，湖人仅第六",
+        category:"sport",
+        source:"直播吧 / ESPN",
+        sourceUrl:"https://news.zhibo8.com/nba/2026-08-24/6a8c4230c0171native.htm",
+        pubTime:"2026‑08‑24",
+        content:`
+<p>ESPN撰文预测新赛季东西部排名：东部前四为尼克斯、活塞、骑士、76人，卫冕气息浓厚的绿军位列第五。</p>
+<p>西部方面马刺力压雷霆登顶预测榜首，掘金第三、火箭第四，拥有詹姆斯旧王朝余晖的湖人仅被排在第六，勇士更是跌至第九的附加赛区。</p>
+<p>预测出炉后球迷争论激烈，尼克斯东部第一和勇士的排名成为最大争议点。</p>
+`
+    },
+    {
+        title:"纽约时报实力榜：尼克斯居首，湖8火10勇士仅列第20",
+        category:"sport",
+        source:"直播吧 / The Athletic",
+        sourceUrl:"https://news.zhibo8.com/nba/2026-08-24/6a8c368d15aa3native.htm",
+        pubTime:"2026‑08‑24",
+        content:`
+<p>美媒《纽约时报》排出2026-27赛季实力榜：尼克斯、马刺、雷霆、76人、骑士位居前五。</p>
+<p>6至10名为活塞、凯尔特人、湖人、森林狼、火箭，而过去五年四冠级别的勇士仅排在第20位，老牌豪门雄鹿更是垫底级别的第29位。</p>
+<p>榜单引发了关于湖人、热火、掘金等多支球队排位偏低的热议，火箭球迷则认为斯玛特加盟后球队实力被低估。</p>
+`
+    },
+    {
+        title:"骑士交易问答：为何宁可要37岁哈登也不要加兰",
+        category:"sport",
+        source:"直播吧 / 老实人报",
+        sourceUrl:"https://news.zhibo8.com/nba/2026-08-24/6a8ba27acaa86native.htm",
+        pubTime:"2026‑08‑24",
+        content:`
+<p>骑士通过重磅交易得到佩顿·沃特森后，当地媒体以自问自答形式复盘了球队阵容剧变：加兰、韦德、亨特离队，换来哈登与沃特森。</p>
+<p>作者坦承最初并不看好哈登交易，但在得知加兰术后脚趾仍有隐患、自称一直只靠9根脚趾打球后改变了看法，认为健康的老将哈登在季后赛舞台更可靠。</p>
+<p>骑士还为哈登送上了3年9700万美元的续约合同，这位8月26日年满37岁的老将将在克利夫兰继续冲击冠军。</p>
+`
+    },
+    {
+        title:"篮协拟增补周琦徐杰征战亚运，最终放弃征召",
+        category:"sport",
+        source:"直播吧",
+        sourceUrl:"https://news.zhibo8.com/nba/2026-08-24/6a8bc86bdc46fnative.htm",
+        pubTime:"2026‑08‑24",
+        content:`
+<p>中国篮协公布男篮亚运会14人大名单，相比世预赛窗口期由余嘉豪顶替杨瀚森、崔永熙顶替赵继伟，整体阵容明显年轻化。</p>
+<p>据媒体人透露，篮协原计划增补周琦、徐杰等有国家队经历的老将集训，但考虑到他们一夏天未跟队训练最终放弃；曾凡博、高诗岩仍在伤病康复，徐昕则专注争取留洋。</p>
+<p>上届主场亚运会仅获第三，本届以年轻阵容出征名古屋，廖三宁、庞峥麟等从头坚持到尾的队员被寄望轻装上阵。</p>
+`
+    },
+    {
+        title:"ESPN战绩预测：马刺62胜领跑，76人火箭分列东西部第四",
+        category:"sport",
+        source:"直播吧 / ESPN",
+        sourceUrl:"https://news.zhibo8.com/nba/2026-08-25/6a8ce45d16d2enative.htm",
+        pubTime:"2026‑08‑25",
+        content:`
+<p>ESPN给出新赛季具体战绩预测：西部马刺62胜、雷霆60胜断层领先，掘金与火箭各51胜，森林狼50胜。</p>
+<p>东部最高预测胜场为尼克斯和活塞的53胜，骑士51胜，休赛期组建豪华阵容的76人以50胜32负排在东部第四。</p>
+<p>榜单另一端，篮网18胜、国王19胜的预测垫底，勇士35胜被看衰至西部第九，再次引发球迷对预测模型可信度的讨论。</p>
+`
+    },
+    {
+        title:"2019年来NBA出现13次球队出售，最高成交价飙至125亿",
+        category:"sport",
+        source:"直播吧 / The Athletic",
+        sourceUrl:"https://news.zhibo8.com/nba/2026-08-25/6a8d3cfc3b9e8native.htm",
+        pubTime:"2026‑08‑25",
+        content:`
+<p>The Athletic统计，自2019年以来NBA已发生13笔控制权出售交易，远超NFL的3次和MLB的5次，球队易主成潮。</p>
+<p>过去7年里篮网、爵士、森林狼、太阳、黄蜂、独行侠、雄鹿、猛龙、凯尔特人、湖人、开拓者等队先后变更股权，湖人估值一年上涨25%，森林狼五年涨至三倍。</p>
+<p>NBA球队最高成交价7年间涨至接近6倍、达125亿美元，联盟资产增值速度令其他北美体育联盟望尘莫及。</p>
+`
+    },
+    {
+        title:"Stein：多队紧盯欧文，独行侠今夏拒绝一切交易询价",
+        category:"sport",
+        source:"直播吧 / Stein",
+        sourceUrl:"https://news.zhibo8.com/nba/2026-08-25/6a8d0a41d21banative.htm",
+        pubTime:"2026‑08‑25",
+        content:`
+<p>名记Marc Stein报道，多支球队仍在持续关注独行侠后卫凯里·欧文的动向，但独行侠整个休赛期都在回绝相关交易报价。</p>
+<p>外界讨论的焦点在于：随着新赛季推进和2月11日交易截止日临近，独行侠还能坚持多久，34岁的欧文与19岁的弗拉格之间的年龄差是核心矛盾。</p>
+<p>球迷普遍认为独行侠的策略是先带弗拉格成长一年、等待满意报价，并不急于低价抛售这位九届全明星。</p>
+`
+    },
+    {
+        title:"韦德之道12谍照带库里LOGO，库里九月中国行在即",
+        category:"sport",
+        source:"直播吧",
+        sourceUrl:"https://news.zhibo8.com/nba/2026-08-25/6a8d9ab50b4aenative.htm",
+        pubTime:"2026‑08‑25",
+        content:`
+<p>韦德之道12设计师发布新鞋谍照，鞋身带有库里的个人LOGO，纪念库里早年球鞋乱穿时期的经典时刻。</p>
+<p>李宁旗下韦德之道系列如今已撑起品牌篮球线的半壁江山，此次跨界元素让球鞋圈热议库一代何时正式亮相。</p>
+<p>另有消息称库里将于9月中旬开启中国行，球迷可以期待他亲临国内与粉丝互动。</p>
+`
+    },
+    {
+        title:"骑士休赛期复盘：首发互补替补强悍，东部第一不是梦",
+        category:"sport",
+        source:"直播吧 / 体育画报",
+        sourceUrl:"https://news.zhibo8.com/nba/2026-08-25/6a8d58b3c76c4native.htm",
+        pubTime:"2026‑08‑25",
+        content:`
+<p>熬到8月底，骑士的休赛期运作被定义为成功：迎回当家球星米切尔，得到哈登并签下4年长约的沃特森，薪资还控制在土豪线以下。</p>
+<p>2米03的沃特森带来詹姆斯二期之后未见过的运动能力，既能护筐又投出40%以上三分，与米切尔、哈登的后场组合及莫布里的策应形成互补，替补席上还有泰森和梅里尔。</p>
+<p>体育画报认为若化学反应顺利，这支骑士完全有能力在常规赛结束时登顶东部。</p>
+`
+    },
+    {
+        title:"28-29赛季历史总薪资榜：杜詹库前3，布克跻身前十",
+        category:"sport",
+        source:"直播吧",
+        sourceUrl:"https://news.zhibo8.com/nba/2026-08-26/6a8ed3ccafe4dnative.htm",
+        pubTime:"2026‑08‑26",
+        content:`
+<p>截至2028-29赛季的NBA历史总薪资榜出炉：杜兰特以5.911亿美元高居第一，詹姆斯5.893亿、库里5.327亿紧随其后。</p>
+<p>保罗·乔治5.169亿排第四，恩比德、哈登、浓眉、字母哥、利拉德与布克分列五至十位。</p>
+<p>球迷感慨五年后布克届时仅33岁却有望冲上总薪资榜首，而乔治的排名也引发关于其合同性价比的调侃。</p>
+`
+    },
+    {
+        title:"勇士15人名单满员：花最多的钱，打附加赛？",
+        category:"sport",
+        source:"直播吧",
+        sourceUrl:"https://news.zhibo8.com/nba/2026-08-26/6a8e50126a8bbnative.htm",
+        pubTime:"2026‑08‑26",
+        content:`
+<p>勇士连签布兰登·威廉姆斯（1年260万）和乔治·尼昂（1年390万）后，15人常规赛大名单正式满员，休赛期引援告一段落。</p>
+<p>阵容平均年龄30岁、四人35+，薪资总额超2亿触发奢侈税，过去5年累计缴税近6亿，但球队竞争力与投入严重倒挂：自2022年夺冠后连续四年未达50胜，三次打附加赛。</p>
+<p>38岁库里仍拿着联盟第一高薪6259万，与巴特勒的双老合计锁死补强空间，花最贵的钱挨最毒的打成为勇士当前的恶性循环。</p>
+`
+    },
+    {
+        title:"名记：巴特勒恢复快于预期，或赶在交易截止日前复出",
+        category:"sport",
+        source:"直播吧 / ClutchPoints",
+        sourceUrl:"https://news.zhibo8.com/nba/2026-08-26/6a8e40320e176native.htm",
+        pubTime:"2026‑08‑26",
+        content:`
+<p>名记Brett Siegel撰文披露，巴特勒的康复至今没有出现任何挫折或限制，恢复进度可能快于外界预期。</p>
+<p>目前被提及的最早复出目标是圣诞节对阵掘金，但更现实的估计是2027年1月或2月，勇士对他的时间表保持沉默且不打算仓促安排。</p>
+<p>若巴特勒能在交易截止日前回归，勇士就能据此制定交易狂潮的应对方案并重新评估季后赛前景。</p>
+`
+    },
+    {
+        title:"王岚嵚祝铭震最终都归山东，郭艾伦离开广州",
+        category:"sport",
+        source:"直播吧",
+        sourceUrl:"https://news.zhibo8.com/nba/2026-08-26/6a8eb1abc53aanative.htm",
+        pubTime:"2026‑08‑26",
+        content:`
+<p>山东男篮官宣王岚嵚正式加盟，两年前那笔载入CBA历史的三方交易就此画上句号。</p>
+<p>2024年8月，同曦、辽宁、广州达成三方协议：王岚嵚租借加盟辽宁三年，郭艾伦的独家签约权转至广州，祝铭震转会同曦。</p>
+<p>两年后，王岚嵚和祝铭震最后都到了山东，郭艾伦则离开广州且仍在养伤，这笔交易的最终走向令球迷唏嘘。</p>
+`
+    },
+    {
+        title:"名记：勇士愿给库里任何他想要的合同，从未讨论交易",
+        category:"sport",
+        source:"直播吧 / ClutchPoints",
+        sourceUrl:"https://news.zhibo8.com/nba/2026-08-26/6a8e34fe2d2cfnative.htm",
+        pubTime:"2026‑08‑26",
+        content:`
+<p>据ClutchPoints名记报道，库里8月30日将获得提前续约资格，最高可签2年1.367亿美元顶薪，双方都希望今夏达成续约。</p>
+<p>勇士管理层表示愿意奉上库里想要的任何合同，即使他把谈判拖到明年夏天成为完全自由球员也不会影响双方的大方向。</p>
+<p>报道提到布伦森、文班亚马、追梦今夏都曾降薪为球队腾空间的先例，但球迷对此并不买账，认为勇士按兵不动还想让库里降薪既当又立。</p>
+`
+    },
+    {
+        title:"76人2K能力值：马克西92最高，四人90+",
+        category:"sport",
+        source:"直播吧",
+        sourceUrl:"https://news.zhibo8.com/nba/2026-08-27/6a8f85a2b5f65native.htm",
+        pubTime:"2026‑08‑27",
+        content:`
+<p>NBA2K27公布新赛季能力值，76人成为最大赢家：马克西以92全队最高，詹姆斯、恩比德、杰伦·布朗均为91。</p>
+<p>一支球队拥有四名90+球员引发热议，其他球队大多只有一人达到这一档位。</p>
+<p>球迷对评分争议不小：布朗打出生涯新高却被降分、马克西的92被质疑偏高，新援埃奇库姆83、迪恩·韦德76。</p>
+`
+    },
+    {
+        title:"雷霆2K能力值：SGA高达97，七人80+",
+        category:"sport",
+        source:"直播吧",
+        sourceUrl:"https://news.zhibo8.com/nba/2026-08-27/6a8f8b09125c2native.htm",
+        pubTime:"2026‑08‑27",
+        content:`
+<p>2K27雷霆全队能力值公布：亚历山大以97领跑全联盟，切特86全队第二，杰伦·威廉姆斯85。</p>
+<p>哈尔滕施泰因、阿杰伊·米切尔82，卡森·华莱士与卡鲁索81，雷霆共有多达七名球员达到80+，阵容厚度冠绝联盟。</p>
+<p>球迷感叹这套主力轮换相比上赛季几乎没降档，雷霆新赛季依然是西部不可忽视的顶级战力。</p>
+`
+    },
+    {
+        title:"ESPN常规赛预测：76人火箭东西部第四，湖人勇士打附加赛",
+        category:"sport",
+        source:"直播吧 / ESPN",
+        sourceUrl:"https://news.zhibo8.com/nba/2026-08-27/6a8feb323b32cnative.htm",
+        pubTime:"2026‑08‑27",
+        content:`
+<p>ESPN内部人士的完整战绩预测显示：东部争冠组为尼克斯、活塞、骑士、76人、凯尔特人，詹姆斯转投76人后与恩比德、布朗、马克西组成豪华阵容。</p>
+<p>西部仍是雷霆、马刺、掘金的天下，他们囊括了过去六个赛季中的五个MVP，加上最佳防守球员文班亚马。</p>
+<p>预测同时给出爆款话题：KD与追梦可能在季中被交易、詹姆斯场均得分或跌破20分、湖人开局可能崩盘，湖人勇士热火均被看衰至附加赛区。</p>
+`
+    },
+    {
+        title:"班凯罗携塔图姆抵达上海，状元探花开启中国行",
+        category:"sport",
+        source:"直播吧",
+        sourceUrl:"https://news.zhibo8.com/nba/2026-08-27/6a8f9f17bf8f0native.htm",
+        pubTime:"2026‑08‑27",
+        content:`
+<p>魔术球星班凯罗在中文社媒发布视频，宣布自己与塔图姆已抵达上海，正式开启中国行。</p>
+<p>作为选秀状元与探花，两位东部全明星锋线的中国之旅引发球迷围观热潮。</p>
+<p>评论区意外掀起塔图姆球迷与质疑者关于其季后赛表现的争论，中国行的商业价值再次得到印证。</p>
+`
+    },
+    {
+        title:"中国球员历代2K最高值：姚明94，杨瀚森70",
+        category:"sport",
+        source:"直播吧",
+        sourceUrl:"https://news.zhibo8.com/nba/2026-08-27/6a8fd7b80ce07native.htm",
+        pubTime:"2026‑08‑27",
+        content:`
+<p>2K27公布杨瀚森新赛季能力值为70、李凯尔为73，媒体顺势盘点中国球员历代2K最高值。</p>
+<p>姚明以2K9的94高居榜首，李凯尔81、易建联76、杨瀚森70、周琦69，王治郅与巴特尔分别只有59和58，孙悦甚至未在游戏中出现。</p>
+<p>榜单引发老球迷激烈讨论，不少人认为王治郅的数值被严重低估，杨瀚森的70也受到了易建联76的对比拷问。</p>
+`
+    },
+    {
+        title:"文班21分钟22+9，法国大胜斯洛文尼亚",
+        category:"sport",
+        source:"直播吧",
+        sourceUrl:"https://news.zhibo8.com/nba/2026-08-28/6a90b6aa33e8fnative.htm",
+        pubTime:"2026‑08‑28",
+        content:`
+<p>男篮世预赛欧洲区L组，法国92-67大胜斯洛文尼亚，文班亚马仅出场21分钟便10投6中、罚球10中9，砍下全场最高的22分9篮板，正负值+22。</p>
+<p>斯洛文尼亚全队最高分仅10分，东契奇因争夺女儿抚养权缺席今夏国家队赛事，球队3胜4负小组垫底。</p>
+<p>文班三分5中1依然执着外线出手成为球迷讨论焦点，不少人认为年轻球员多练三分无可厚非。</p>
+`
+    },
+    {
+        title:"FIBA亚洲区预选赛首日最佳阵容：杨瀚森领衔",
+        category:"sport",
+        source:"直播吧",
+        sourceUrl:"https://news.zhibo8.com/nba/2026-08-28/6a914bcf76d12native.htm",
+        pubTime:"2026‑08‑28",
+        content:`
+<p>FIBA公布亚洲区预选赛首个比赛日最佳阵容，中国球员杨瀚森凭借15分9篮板入选。</p>
+<p>日本双核八村塁（29分3记三分）与霍金森（21分4板）携手上榜，沙特的阿尔苏韦勒姆砍下19分16板，黎巴嫩的梅哲送出9分8助攻。</p>
+<p>亚洲各队归化与混血球员的表现成为讨论热点，中国队也被提醒需正视日本等对手的实力提升。</p>
+`
+    },
+    {
+        title:"NBA官推盛赞杨瀚森：精彩表现助中国男篮取胜",
+        category:"sport",
+        source:"直播吧",
+        sourceUrl:"https://news.zhibo8.com/nba/2026-08-28/6a90f7a8ab22fnative.htm",
+        pubTime:"2026‑08‑28",
+        content:`
+<p>男篮世亚预，中国男篮83-57大胜卡塔尔，杨瀚森替补出战不到20分钟，11投7中高效得到15分9篮板1助攻1盖帽（原文另记2帽）。</p>
+<p>NBA官方推特罕见晒出杨瀚森集锦并配文夸赞，强调他帮助中国男篮拿下世预赛胜利。</p>
+<p>球迷评价其防守换防、策应传球已有约基奇的影子，但也有声音提醒到了NBA终究要靠实力说话。</p>
+`
+    },
+    {
+        title:"ESPN预测KD与追梦季中被交易，詹姆斯场均或低于20分",
+        category:"sport",
+        source:"直播吧 / ESPN",
+        sourceUrl:"https://news.zhibo8.com/nba/2026-08-28/6a9132146c68dnative.htm",
+        pubTime:"2026‑08‑28",
+        content:`
+<p>ESPN夏季预测继续放料：内部人士认为杜兰特和追梦很可能在交易截止日前改换门庭，成为最早被摆上货架的超级巨星。</p>
+<p>关于詹姆斯在76人的首个赛季，预测倾向于其场均得分将跌破20分，湖人则可能开局崩盘。</p>
+<p>黑马球队票选中步行者与爵士并列第一，各自获得46分，刚拿到高顺位新秀的奇才、爵士被看好大幅跃升。</p>
+`
+    },
+    {
+        title:"杜兰特早年25万美元投资HuggingFace，收益超6000万",
+        category:"sport",
+        source:"直播吧 / Joe Pompliano",
+        sourceUrl:"https://news.zhibo8.com/nba/2026-08-28/6a90f682f298anative.htm",
+        pubTime:"2026‑08‑28",
+        content:`
+<p>随着英伟达以129亿美元收购Hugging Face，杜兰特与商业伙伴在该公司种子轮和A轮的投资浮出水面，合计投入约25万美元。</p>
+<p>体育商业媒体人估算，仅这一笔投资杜兰特的收益就可能超过6000万美元，而他新赛季薪水4390万只有投资收益的七成左右。</p>
+<p>球迷纷纷调侃杜总的投资眼光，称其距离身价十亿的目标又近了一步。</p>
+`
+    },
+    {
+        title:"名记：勇士已备好库里顶薪，从未讨论过交易他",
+        category:"sport",
+        source:"直播吧 / ClutchPoints",
+        sourceUrl:"https://news.zhibo8.com/nba/2026-08-29/6a9207509465fnative.htm",
+        pubTime:"2026‑08‑29",
+        content:`
+<p>ClutchPoints名记在节目中确认，库里自8月29日起有资格签下2年1.367亿美元的提前续约合同，新约将覆盖至2028-29赛季。</p>
+<p>勇士方面的态度是空白支票式开放：库里想要顶薪就给顶薪，想拿折扣合同也同样接受，即便拖到明年成为完全自由球员再谈长约也没问题。</p>
+<p>报道同时强调勇士内部从未讨论过交易库里，双方均希望他终老勇士。</p>
+`
+    },
+    {
+        title:"库里连续10年蝉联NBA年薪王，今起可签2年1.37亿",
+        category:"sport",
+        source:"直播吧",
+        sourceUrl:"https://news.zhibo8.com/nba/2026-08-29/6a922394cc8ebnative.htm",
+        pubTime:"2026‑08‑29",
+        content:`
+<p>自2017-18赛季加冕NBA薪资榜首后，库里已连续10个赛季占据年薪王宝座，上一次领跑全联盟的还是2016-17赛季的詹姆斯。</p>
+<p>2026-27赛季38岁的库里将以约6260万美元年薪继续稳居第一，而当年他的年薪曾仅有1210万美元。</p>
+<p>目前他有资格签下两年约1.37亿美元的提前续约合同，球迷感叹这一成就需要一人一城、球队不敢交易等多重苛刻条件同时满足。</p>
+`
+    },
+    {
+        title:"科迪·威被交易至森林狼，杰伦威约战圣诞大战",
+        category:"sport",
+        source:"直播吧 / Shams",
+        sourceUrl:"https://news.zhibo8.com/nba/2026-08-29/6a925f0104d4dnative.htm",
+        pubTime:"2026‑08‑29",
+        content:`
+<p>据Shams报道，森林狼将约什·格林和现金送至爵士，换来科迪·威廉姆斯和康查尔。</p>
+<p>交易完成后，科迪·威将与哥哥杰伦·威在圣诞大战中正面交锋，该场森林狼主场迎战雷霆。</p>
+<p>哥哥第一时间转发弟弟的交易新闻并喊话：兄弟，圣诞大战见了，兄弟对决成为新赛季圣诞大战的新看点。</p>
+`
+    },
+    {
+        title:"奎塔16+9，葡萄牙队史首胜西班牙",
+        category:"sport",
+        source:"直播吧",
+        sourceUrl:"https://news.zhibo8.com/nba/2026-08-29/6a922936f0ec5native.htm",
+        pubTime:"2026‑08‑29",
+        content:`
+<p>男篮世预赛，葡萄牙95-89逆转击败西班牙，这是葡萄牙男篮队史首次在正式比赛中战胜西班牙。</p>
+<p>凯尔特人内线奎塔贡献16分9篮板2抢断，西班牙方面阿代·马拉得到12分6篮板4盖帽。</p>
+<p>球迷感慨大小加索尔退役后西班牙篮球明显下滑，并调侃C罗没做到的事奎塔做到了。</p>
+`
+    },
+    {
+        title:"美媒：杨瀚森世预赛表现出色，开拓者该给更多机会",
+        category:"sport",
+        source:"直播吧 / ClutchPoints",
+        sourceUrl:"https://news.zhibo8.com/nba/2026-08-29/6a92b73ea7751native.htm",
+        pubTime:"2026‑08‑29",
+        content:`
+<p>美媒ClutchPoints撰文称，凭借传球视野与篮球智商，杨瀚森常被拿来与约基奇相提并论，世预赛的出色表现将助力他的NBA二年级赛季。</p>
+<p>对阵卡塔尔一战他在不到20分钟里11投7中砍下15分9篮板2盖帽，此前夏季联赛场均13分8.5篮板3.8助攻1.5盖帽。</p>
+<p>文章指出目前开拓者内线轮换中他排在克林根、罗伯特·威廉姆斯等人之后，主帅诺里理应考虑给这位21岁中锋更多出场时间。</p>
+`
+    },
+    {
+        title:"库里续约窗口正式开启：现在签2年1.367亿或明夏签3年2.07亿",
+        category:"sport",
+        source:"直播吧 / ESPN",
+        sourceUrl:"https://news.zhibo8.com/nba/2026-08-30/6a935dabea56anative.htm",
+        pubTime:"2026‑08‑30",
+        content:`
+<p>ESPN薪资专家Bobby Marks确认，库里与勇士的提前续约窗口已开启，即日起至6月30日可签最高2年1.367亿美元合同。</p>
+<p>受38岁规则限制，提前续约最长两年，两年薪资分别为6570万和7100万；若等到明年成为自由球员，他最多可签3年2.07亿美元。</p>
+<p>库里现有合同还剩一年，2026-27赛季薪资约6259万美元为全联盟最高，上赛季他场均贡献26.6分3.6篮板4.7助攻。</p>
+`
+    },
+    {
+        title:"彻底告别孟菲斯：莫兰特320万卖掉当地豪宅",
+        category:"sport",
+        source:"直播吧",
+        sourceUrl:"https://news.zhibo8.com/nba/2026-08-30/6a938ef622869native.htm",
+        pubTime:"2026‑08‑30",
+        content:`
+<p>据美媒报道，莫兰特以320万美元卖掉了孟菲斯东部的豪宅，这套房产是他在2022年签下5年1.97亿续约合同后以约300万美元购入的。</p>
+<p>豪宅占地超1208平方米，拥有7卧11卫、私人湖泊、六车位车库、家庭影院与桑拿房，距离他2019年为父母购买的住宅仅约19米。</p>
+<p>今年休赛期莫兰特被交易至开拓者，出售孟菲斯房产被视为与老东家彻底告别的信号。</p>
+`
+    },
+    {
+        title:"利拉德训练1168投1100中，莫兰特：新赛季会很有趣",
+        category:"sport",
+        source:"直播吧",
+        sourceUrl:"https://news.zhibo8.com/nba/2026-08-30/6a939313cd7a2native.htm",
+        pubTime:"2026‑08‑30",
+        content:`
+<p>开拓者球星利拉德晒出训练数据：投篮1168投1100中，命中率高达94%。</p>
+<p>新队友莫兰特在评论区互动：这（新赛季）会很有趣，两人对新赛季的后场搭档充满期待。</p>
+<p>球迷看好利拉德伤愈后与莫兰特、阿夫迪亚、克林根组成的核心阵容在西部搞事情，并感慨跟腱重伤在现代医疗条件下已不再是生涯终点。</p>
+`
+    },
+    {
+        title:"中国男篮主场战黎巴嫩：12人名单不变，杨瀚森领衔",
+        category:"sport",
+        source:"直播吧",
+        sourceUrl:"https://news.zhibo8.com/nba/2026-08-30/6a944c6310b25native.htm",
+        pubTime:"2026‑08‑30",
+        content:`
+<p>男篮世亚预第二阶段，中国男篮将于8月31日19:30主场迎战黎巴嫩，FIBA官网显示12人大名单保持不变。</p>
+<p>胡明轩、赵继伟、廖三宁、胡金秋、杨瀚森等人在列，此前客场大胜卡塔尔一役杨瀚森表现亮眼。</p>
+<p>球迷对主帅郭士强的用人和球队前景讨论激烈，普遍认为黎巴嫩实力不俗、主场之战不容有失。</p>
+`
+    },
+    {
+        title:"媒体人：华莱士新赛季戏份更重，有望证明配得上顶薪",
+        category:"sport",
+        source:"直播吧",
+        sourceUrl:"https://news.zhibo8.com/nba/2026-08-30/6a93a9041bb9cnative.htm",
+        pubTime:"2026‑08‑30",
+        content:`
+<p>播客节目谈到2023届新秀的提前续约话题，其中雷霆后卫卡森·华莱士今夏未能完成提前续约。</p>
+<p>评论认为，由于雷霆交易走了部分球员，华莱士新赛季将承担更重要的角色，现在不提前续约是合理操作，他有机会用表现证明自己配得上25%顶薪。</p>
+<p>球迷则对场均8分的球员进入顶薪讨论表示惊讶，认为雷霆整体薪资结构健康、无需急于续约。</p>
+`
+    },
+    {
+        title:"金牌助教菲尔·汉迪官宣加盟76人，与詹姆斯三度联手",
+        category:"sport",
+        source:"直播吧",
+        sourceUrl:"https://news.zhibo8.com/nba/2026-08-31/6a94d651b5f0anative.htm",
+        pubTime:"2026‑08‑31",
+        content:`
+<p>金牌助教菲尔·汉迪更新社媒宣布新赛季加盟76人，并向老东家独行侠致谢。</p>
+<p>这将是他在骑士、湖人之后第三次与詹姆斯合作，也是继猛龙之后第二次与76人主帅纳斯搭档，还曾与76人篮球运营总裁甘西在骑士共事。</p>
+<p>汉迪与这几位核心人物的历次合作都拿到了总冠军（2016、2019、2020），球迷戏称汉迪定律又上线了。</p>
+`
+    },
+    {
+        title:"杰伦·布朗波士顿告别派对：我曾誓为这座城市浴血奋战",
+        category:"sport",
+        source:"直播吧",
+        sourceUrl:"https://news.zhibo8.com/nba/2026-08-31/6a94cb0814167native.htm",
+        pubTime:"2026‑08‑31",
+        content:`
+<p>被交易至76人后，杰伦·布朗在波士顿街区举行告别派对，深情致谢效力多年的城市。</p>
+<p>他动情表示初到波士顿时就立誓为这座城市浴血奋战，感谢社区邻里、引路人和在自我怀疑时依然支持他的球迷，并称这份爱是双向奔赴。</p>
+<p>今夏布朗在凯尔特人与76人的重磅交易中改换门庭，与詹姆斯、恩比德成为队友。</p>
+`
+    },
+    {
+        title:"追梦谈库明加：650万合同有隐患，磨合不顺第一个被处理",
+        category:"sport",
+        source:"直播吧",
+        sourceUrl:"https://news.zhibo8.com/nba/2026-08-31/6a94cf22d09ccnative.htm",
+        pubTime:"2026‑08‑31",
+        content:`
+<p>追梦在播客中谈到库明加以相对低价签约森林狼一事，直言650万美元本身只是替补级别薪水，其中暗藏隐患。</p>
+<p>他担心一旦森林狼的首发阵容开局效果不佳、数据也证明搭配失灵，库明加会成为第一个被拔掉的插头。</p>
+<p>球迷普遍认同这一判断，认为小合同好处理、森林狼没必要陪他刷数据混高薪，明年他大概率再度跳出合同上演肥皂剧。</p>
+`
+    },
+    {
+        title:"中国男篮VS黎巴嫩前瞻：对手锋线强+新归化，内线仍是优势",
+        category:"sport",
+        source:"直播吧",
+        sourceUrl:"https://news.zhibo8.com/nba/2026-08-31/6a9502efd0c5anative.htm",
+        pubTime:"2026‑08‑31",
+        content:`
+<p>世预赛第二阶段第二场，中国男篮主场迎战小组第一的黎巴嫩，12人名单与上轮保持不变。</p>
+<p>黎巴嫩上轮大胜韩国，坐拥2米05的新归化球员芬德伯克（上轮13分5板）和哈亚特（21分6板）等强力锋线，篮板冲抢能力突出。</p>
+<p>中国男篮的优势仍在内线，胡金秋、杨瀚森、焦泊乔各有特点，主帅郭士强表示对手实力较强、球队将全力一搏力争取胜。</p>
+`
+    },
+    {
+        title:"专家：雷霆三巨头明夏薪资将达1.5亿，华莱士预计大幅加薪",
+        category:"sport",
+        source:"直播吧 / ESPN",
+        sourceUrl:"https://news.zhibo8.com/nba/2026-08-31/6a94da6472124native.htm",
+        pubTime:"2026‑08‑31",
+        content:`
+<p>ESPN薪资专家在雷霆休赛期总结中指出，SGA、切特和杰伦威三位核心在2027-28赛季的薪资总和将达1.5亿美元，普雷斯蒂明年夏天需要重新评估球队构架。</p>
+<p>22岁的卡森·华莱士明夏也将获得提前续约资格，预计大幅加薪，而他下赛季薪资仅约742万美元。</p>
+<p>球迷感叹雷霆的新秀红利即将吃完，小市场球队同时容纳三份顶薪的难度极大，交易杰伦威换取选秀权成为讨论中的选项。</p>
+`
     }
+
 ];
 
 
@@ -849,6 +2169,21 @@ const FONT_KEY = "news_reader_fontroot";
 const THEME_KEY = "news_reader_dark";
 const LAST_ART_KEY = "news_reader_lastart";
 const HISTORY_KEY = "news_reader_history";
+const THEME2_KEY = "news_reader_theme";
+const LH_KEY = "news_reader_lineheight";
+const LS_KEY = "news_reader_letterspacing";
+const FAM_KEY = "news_reader_fontfamily";
+const BKMK_KEY = "news_reader_bookmark";
+
+
+//防抖工具：减少滚动/输入等高频事件的重绘与存储压力
+function debounce(fn, wait){
+    let t = null;
+    return function(...args){
+        clearTimeout(t);
+        t = setTimeout(()=>fn.apply(this, args), wait);
+    };
+}
 
 
 //toast工具
@@ -971,23 +2306,66 @@ fontBtns.forEach(btn=>{
 });
 
 
-//暗黑模式
-const themeBtn = document.getElementById("themeBtn");
-let darkMode = localStorage.getItem(THEME_KEY) === "1";
-function applyDark(){
-    if(darkMode){
-        document.documentElement.setAttribute("data-theme","dark");
-        themeBtn.innerText = "切换浅色模式";
-    }else{
-        document.documentElement.removeAttribute("data-theme");
-        themeBtn.innerText = "切换暗黑模式";
-    }
+//阅读排版：行距 / 字距 / 正文字体，滑动即时生效、存储防抖
+const FONT_FAMILY_MAP = {
+    sys: "inherit",
+    song: '"SimSun","STSong","宋体",serif',
+    yahei: '"Microsoft YaHei","微软雅黑",sans-serif',
+    kai: '"KaiTi","STKaiti","楷体",serif'
+};
+const lhRange = document.getElementById("lhRange");
+const lsRange = document.getElementById("lsRange");
+const fontFamSel = document.getElementById("fontFamSel");
+function applyTypography(){
+    const lh = localStorage.getItem(LH_KEY) || "2.0";
+    const ls = localStorage.getItem(LS_KEY) || "0";
+    const fam = localStorage.getItem(FAM_KEY) || "sys";
+    const rootStyle = document.documentElement.style;
+    rootStyle.setProperty("--art-lh", lh);
+    rootStyle.setProperty("--art-ls", ls + "px");
+    rootStyle.setProperty("--art-ff", FONT_FAMILY_MAP[fam] || "inherit");
+    if(lhRange) lhRange.value = lh;
+    if(lsRange) lsRange.value = ls;
+    if(fontFamSel) fontFamSel.value = fam;
 }
-applyDark();
+lhRange.addEventListener("input", debounce(()=>{
+    localStorage.setItem(LH_KEY, lhRange.value);
+    applyTypography();
+},100));
+lsRange.addEventListener("input", debounce(()=>{
+    localStorage.setItem(LS_KEY, lsRange.value);
+    applyTypography();
+},100));
+fontFamSel.addEventListener("change", ()=>{
+    localStorage.setItem(FAM_KEY, fontFamSel.value);
+    applyTypography();
+});
+applyTypography();
+
+
+//主题模式：白天 / 夜间 / 护眼，三档循环，本地持久化
+const themeBtn = document.getElementById("themeBtn");
+const THEME_LABEL = { light:"☀️白天", dark:"🌙夜间", eye:"👀护眼" };
+let themeMode = localStorage.getItem(THEME2_KEY);
+if(!themeMode){
+    //兼容旧版暗黑开关的存储值
+    themeMode = (localStorage.getItem(THEME_KEY) === "1") ? "dark" : "light";
+}
+function applyTheme(){
+    if(themeMode === "light"){
+        document.documentElement.removeAttribute("data-theme");
+    }else{
+        document.documentElement.setAttribute("data-theme", themeMode);
+    }
+    themeBtn.innerText = "主题：" + THEME_LABEL[themeMode];
+    localStorage.setItem(THEME2_KEY, themeMode);
+    localStorage.setItem(THEME_KEY, themeMode === "dark" ? "1" : "0"); //旧键同步，便于回退旧版本
+}
+applyTheme();
 themeBtn.onclick = ()=>{
-    darkMode = !darkMode;
-    localStorage.setItem(THEME_KEY, darkMode ? "1":"0");
-    applyDark();
+    themeMode = themeMode === "light" ? "dark" : (themeMode === "dark" ? "eye" : "light");
+    applyTheme();
+    showToast("已切换：" + THEME_LABEL[themeMode] + "模式");
 };
 
 
@@ -1008,6 +2386,17 @@ focusBtn.onclick = function(){
     }
 };
 
+
+//工具箱展开/收起
+document.getElementById("toolBoxToggle").onclick = function(){
+    const panel = document.getElementById("toolPanel");
+    const btn = document.getElementById("toolBoxToggle");
+    const arrow = document.getElementById("toolArrow");
+    const open = panel.classList.toggle("open");
+    btn.classList.toggle("active", open);
+    // 收起时显示下拉箭头 ▼，展开后箭头翻转朝上 ▲
+    arrow.innerText = open ? "▲" : "▼";
+};
 
 //刷新按钮逻辑，增加loading视觉反馈
 const listLoading = document.getElementById("listLoading");
@@ -1099,22 +2488,216 @@ function goBack(){
 }
 
 
-//保存阅读滚动位置 & 上次文章
-detailBox.addEventListener("scroll",()=>{
-    if(!currentArticleId) return;
-    const pos = getScrollPos();
-    pos[currentArticleId] = detailBox.scrollTop;
-    saveScrollPos(pos);
-    //计算阅读进度条
+//保存阅读滚动位置 & 上次文章（存储防抖 + rAF进度条 + 百分比气泡）
+const pctBadge = document.createElement("div");
+pctBadge.className = "read-pct-badge";
+document.body.appendChild(pctBadge);
+let pctBadgeTimer = null;
+function updateProgress(){
     const scrollTop = detailBox.scrollTop;
     const scrollHeight = detailBox.scrollHeight - detailBox.clientHeight;
     const percent = scrollHeight <= 0 ? 0 : (scrollTop / scrollHeight)*100;
     const bar = document.getElementById("progressBar");
     if(bar) bar.style.width = percent + "%";
+    if(currentArticleId){
+        const rect = detailBox.getBoundingClientRect();
+        pctBadge.style.top = (rect.top + 14) + "px";
+        pctBadge.style.right = Math.max(8, (window.innerWidth - rect.right + 16)) + "px";
+        pctBadge.innerText = Math.round(percent) + "%";
+        pctBadge.classList.add("show");
+        clearTimeout(pctBadgeTimer);
+        pctBadgeTimer = setTimeout(()=>pctBadge.classList.remove("show"), 1400);
+    }
+}
+let progressRaf = false;
+const saveScrollDebounced = debounce(()=>{
+    if(!currentArticleId) return;
+    const pos = getScrollPos();
+    pos[currentArticleId] = detailBox.scrollTop;
+    saveScrollPos(pos);
+},150);
+detailBox.addEventListener("scroll",()=>{
+    if(!progressRaf){
+        progressRaf = true;
+        requestAnimationFrame(()=>{
+            progressRaf = false;
+            updateProgress();
+        });
+    }
+    saveScrollDebounced();
 });
+//关闭页面时兜底保存当前阅读位置
+window.addEventListener("beforeunload",()=>{
+    if(!currentArticleId) return;
+    const pos = getScrollPos();
+    pos[currentArticleId] = detailBox.scrollTop;
+    saveScrollPos(pos);
+});
+//点击文章顶部进度条区域，按比例跳转阅读位置
+detailBox.addEventListener("click",(e)=>{
+    const rect = detailBox.getBoundingClientRect();
+    const offsetTop = e.clientY - rect.top;
+    if(offsetTop >= 0 && offsetTop <= 10){
+        e.preventDefault();
+        e.stopPropagation();
+        const ratio = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
+        detailBox.scrollTop = ratio * (detailBox.scrollHeight - detailBox.clientHeight);
+        updateProgress();
+        if(currentArticleId){
+            const pos = getScrollPos();
+            pos[currentArticleId] = detailBox.scrollTop;
+            saveScrollPos(pos);
+        }
+    }
+},true);
 
 
 //通过aid打开文章，用于历史记录恢复
+let currentListAids = [];   //当前列表顺序（供上一篇/下一篇翻页）
+let artSearchMatches = [];  //文内搜索命中项
+let artSearchCursor = -1;   //当前命中项游标
+
+
+//正文纯文本长度（用于阅读时长估算）
+function plainLen(html){
+    return html.replace(/<[^>]+>/g,"").replace(/\s+/g,"").length;
+}
+
+
+//文内搜索：清除高亮
+function clearArticleMarks(){
+    const root = document.getElementById("articleContentDom");
+    if(!root) return;
+    root.querySelectorAll("mark.hl").forEach(m=>{
+        const p = m.parentNode;
+        if(!p) return;
+        while(m.firstChild) p.insertBefore(m.firstChild, m);
+        m.remove();
+        p.normalize();
+    });
+}
+
+
+//文内搜索：在高亮结果间跳转
+function stepArticleMatch(dir){
+    if(!artSearchMatches.length) return;
+    if(artSearchCursor >= 0) artSearchMatches[artSearchCursor].classList.remove("current");
+    artSearchCursor = (artSearchCursor + dir + artSearchMatches.length) % artSearchMatches.length;
+    const cur = artSearchMatches[artSearchCursor];
+    cur.classList.add("current");
+    cur.scrollIntoView({ block:"center" });
+}
+
+
+//文内搜索：绑定输入与跳转按钮
+function bindArticleSearch(){
+    const input = document.getElementById("artSearchInput");
+    if(!input) return;
+    const doSearch = debounce(()=>{
+        const kw = input.value.trim();
+        clearArticleMarks();
+        artSearchMatches = [];
+        artSearchCursor = -1;
+        const cnt = document.getElementById("artSearchCount");
+        if(!kw){
+            if(cnt) cnt.innerText = "";
+            return;
+        }
+        const root = document.getElementById("articleContentDom");
+        if(!root) return;
+        const lkw = kw.toLowerCase();
+        const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+            acceptNode(n){
+                if(!n.textContent || !n.textContent.trim()) return NodeFilter.FILTER_REJECT;
+                if(n.parentNode && n.parentNode.nodeName === "MARK") return NodeFilter.FILTER_REJECT;
+                return n.textContent.toLowerCase().includes(lkw) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+            }
+        });
+        const hits = [];
+        while(walker.nextNode()) hits.push(walker.currentNode);
+        hits.forEach(n=>{
+            const text = n.textContent;
+            const lower = text.toLowerCase();
+            let idx = lower.indexOf(lkw), last = 0;
+            const frag = document.createDocumentFragment();
+            while(idx !== -1){
+                if(idx > last) frag.appendChild(document.createTextNode(text.slice(last, idx)));
+                const m = document.createElement("mark");
+                m.className = "hl";
+                m.textContent = text.slice(idx, idx + kw.length);
+                frag.appendChild(m);
+                last = idx + kw.length;
+                idx = lower.indexOf(lkw, last);
+            }
+            if(last < text.length) frag.appendChild(document.createTextNode(text.slice(last)));
+            n.parentNode.replaceChild(frag, n);
+        });
+        artSearchMatches = [...root.querySelectorAll("mark.hl")];
+        if(cnt) cnt.innerText = artSearchMatches.length ? (artSearchMatches.length + "处") : "无匹配";
+    },200);
+    input.addEventListener("input", doSearch);
+    document.getElementById("artSearchPrev").onclick = ()=>stepArticleMatch(-1);
+    document.getElementById("artSearchNext").onclick = ()=>stepArticleMatch(1);
+    input.addEventListener("keydown", e=>{
+        if(e.key === "Enter"){
+            e.preventDefault();
+            stepArticleMatch(1);
+        }
+    });
+}
+
+
+//生成文章目录：优先解析 h1-h6；无标题时按段落分组生成概要目录
+function buildTocFor(nodes, getCursor, loadMore){
+    const tocBody = document.getElementById("tocBody");
+    if(!tocBody) return;
+    tocBody.innerHTML = "";
+    const heads = nodes.filter(n=>n.nodeType===1 && /^H[1-6]$/.test(n.tagName));
+    const entries = [];
+    if(heads.length >= 2){
+        heads.forEach((h,i)=>{
+            h.id = "toc-head-" + i;
+            entries.push({ id:h.id, text:(h.innerText || "").trim() || ("标题" + (i+1)), level:+h.tagName[1] });
+        });
+    }else{
+        let group = 0, cnt = 0;
+        nodes.forEach(n=>{
+            if(n.nodeType===1 && n.tagName === "P"){
+                if(cnt % 4 === 0){
+                    n.id = "toc-para-" + group;
+                    const t = (n.innerText || "").trim().replace(/\s+/g," ");
+                    entries.push({ id:n.id, text:t.slice(0,22) + (t.length > 22 ? "…" : ""), level:2 });
+                    group++;
+                }
+                cnt++;
+            }
+        });
+    }
+    if(!entries.length){
+        const empty = document.createElement("div");
+        empty.className = "toc-item";
+        empty.style.color = "var(--text-sub)";
+        empty.innerText = "（本文较短，无目录）";
+        tocBody.appendChild(empty);
+        return;
+    }
+    entries.forEach(en=>{
+        const d = document.createElement("div");
+        d.className = "toc-item toc-l" + en.level;
+        d.innerText = en.text;
+        d.title = en.text;
+        d.onclick = ()=>{
+            //懒加载场景：目标段落可能尚未渲染，先补齐内容
+            let guard = 0;
+            while(!document.getElementById(en.id) && getCursor() < nodes.length && guard++ < 200) loadMore();
+            const el = document.getElementById(en.id);
+            if(el) el.scrollIntoView({ block:"start" });
+        };
+        tocBody.appendChild(d);
+    });
+}
+
+
 function openArticleByAid(aid){
     const parts = aid.split("_");
     const title = parts.slice(1).join("_");
@@ -1128,17 +2711,32 @@ function openArticleByAid(aid){
     currentArticleId = aid;
     localStorage.setItem(LAST_ART_KEY,JSON.stringify({aid:aid}));
     pushHistory(aid,item.title);
+    const readMin = Math.max(1, Math.round(plainLen(item.content)/400));
     detailBox.innerHTML = `
         <div class="read-progress-bar" id="progressBar"></div>
         <button class="back-btn show" id="goBackBtn">← 返回列表</button>
         <div class="article-tool-bar">
+            <button class="tool-btn pager-btn" id="prevArtBtn">⬅上一篇</button>
+            <button class="tool-btn pager-btn" id="nextArtBtn">下一篇➡</button>
             <button class="tool-btn" id="copyArticleBtn">📋复制全文</button>
+            <button class="tool-btn" id="setBookmarkBtn">🔖存书签</button>
+            <button class="tool-btn" id="tocToggleBtn">📑目录</button>
+            <div class="art-search-box">
+                <input id="artSearchInput" placeholder="🔍 文内搜索" autocomplete="off">
+                <button class="tool-btn" id="artSearchPrev">▲</button>
+                <button class="tool-btn" id="artSearchNext">▼</button>
+                <span class="art-search-count" id="artSearchCount"></span>
+            </div>
+        </div>
+        <div class="toc-panel" id="tocPanel">
+            <div class="toc-title">📑 文章目录</div>
+            <div id="tocBody"></div>
         </div>
         <h2 class="art-title">${item.title}</h2>
         <span class="art-tag ${item.category==="tech"?"tag-tech":"tag-sport"}">${item.category==="tech"?"科技":"体育"}</span>
-        <div class="art-time">发布时间：${item.pubTime}</div>
+        <div class="art-time">发布时间：${item.pubTime}｜⏱ 预计阅读 ${readMin} 分钟</div>
         <div class="art-meta">来源：${item.source}｜<a target="_blank" href="${item.sourceUrl}">查看原文链接</a></div>
-        <div class="art-content" id="articleContentDom">${item.content}</div>
+        <div class="art-content" id="articleContentDom"></div>
     `;
     document.getElementById("goBackBtn").onclick = goBack;
     //复制全文
@@ -1151,11 +2749,79 @@ function openArticleByAid(aid){
             showToast("复制失败");
         }
     };
+    //===== 内容解析 + 长文懒渲染 =====
+    const contentDom = document.getElementById("articleContentDom");
+    const tmp = document.createElement("div");
+    tmp.innerHTML = item.content;
+    const nodes = [...tmp.childNodes].filter(n=>n.nodeType===1 || (n.nodeType===3 && n.textContent.trim()));
+    const CHUNK = 25;
+    const lazy = nodes.length > CHUNK + 10;
+    let cursorIdx = 0;
+    const sentinel = document.createElement("div");
+    sentinel.className = "lazy-sentinel";
+    sentinel.innerText = "⏬ 继续下拉加载剩余内容…";
+    let lazyObserver = null;
+    function appendChunk(){
+        const end = Math.min(cursorIdx + CHUNK, nodes.length);
+        const frag = document.createDocumentFragment();
+        for(; cursorIdx < end; cursorIdx++) frag.appendChild(nodes[cursorIdx]);
+        if(sentinel.parentNode === contentDom){
+            contentDom.insertBefore(frag, sentinel);
+        }else{
+            contentDom.appendChild(frag);
+        }
+        if(cursorIdx >= nodes.length){
+            sentinel.remove();
+            if(lazyObserver) lazyObserver.disconnect();
+        }
+    }
+    if(lazy){
+        contentDom.appendChild(sentinel);
+        appendChunk();
+        lazyObserver = new IntersectionObserver((ents)=>{
+            if(ents.some(en=>en.isIntersecting)) appendChunk();
+        },{ root: detailBox, rootMargin:"700px" });
+        lazyObserver.observe(sentinel);
+    }else{
+        appendChunk();
+    }
+    //===== 目录（可折叠侧边栏） =====
+    const tocPanel = document.getElementById("tocPanel");
+    document.getElementById("tocToggleBtn").onclick = ()=>{
+        tocPanel.classList.toggle("open");
+    };
+    buildTocFor(nodes, ()=>cursorIdx, appendChunk);
+    //===== 上一篇 / 下一篇翻页 =====
+    const pos = currentListAids.indexOf(aid);
+    const prevBtn = document.getElementById("prevArtBtn");
+    const nextBtn = document.getElementById("nextArtBtn");
+    prevBtn.disabled = pos <= 0;
+    nextBtn.disabled = pos === -1 || pos >= currentListAids.length - 1;
+    prevBtn.onclick = ()=>{ if(pos > 0) openArticleByAid(currentListAids[pos-1]); };
+    nextBtn.onclick = ()=>{ if(pos >= 0 && pos < currentListAids.length-1) openArticleByAid(currentListAids[pos+1]); };
+    //===== 书签：保存当前阅读位置 =====
+    document.getElementById("setBookmarkBtn").onclick = ()=>{
+        localStorage.setItem(BKMK_KEY, JSON.stringify({
+            aid: aid,
+            title: item.title,
+            scrollTop: detailBox.scrollTop,
+            time: Date.now()
+        }));
+        showToast("已保存书签，可随时用“📍跳转书签”返回此处");
+    };
+    //===== 文内搜索 =====
+    bindArticleSearch();
+    //===== 恢复上次阅读位置（懒加载时先补齐内容再定位） =====
     const posMap = getScrollPos();
+    const savedTop = posMap[aid] || 0;
     setTimeout(()=>{
-        if(posMap[aid]) detailBox.scrollTop = posMap[aid];
-        else detailBox.scrollTop = 0;
-    },20);
+        let guard = 0;
+        while(lazy && cursorIdx < nodes.length && detailBox.scrollHeight - detailBox.clientHeight <= savedTop && guard++ < 200){
+            appendChunk();
+        }
+        detailBox.scrollTop = savedTop;
+        updateProgress();
+    },30);
     renderList();
 }
 
@@ -1178,6 +2844,15 @@ function renderList(){
     if(kw){
         arr = arr.filter(it=> it.title.toLowerCase().includes(kw));
     }
+    if(currentCat === "all"){
+        // “全部”视图分组显示：上半部分AI(tech)，下半部分体育(sport)，组内保持原有顺序
+        arr = arr.slice().sort((a,b)=>(a.category==="tech"?0:1)-(b.category==="tech"?0:1));
+    }
+    //记录当前展示顺序，供“上一篇/下一篇”翻页使用
+    currentListAids = arr.map(it=>{
+        const realIdx = articleData.findIndex(x=>x.title === it.title);
+        return realIdx + "_" + it.title;
+    });
     listBox.innerHTML = "";
     if(arr.length === 0){
         listBox.innerHTML = `<div class="no-match">暂无匹配文章</div>`;
@@ -1230,7 +2905,7 @@ document.querySelectorAll(".tab-btn").forEach(btn=>{
         renderList();
     }
 });
-searchInput.oninput = ()=>{
+const searchRenderDebounced = debounce(()=>{
     currentArticleId = null;
     localStorage.removeItem(LAST_ART_KEY);
     detailBox.innerHTML = `
@@ -1241,7 +2916,8 @@ searchInput.oninput = ()=>{
         </div>
     `;
     renderList();
-};
+},160);
+searchInput.oninput = searchRenderDebounced;
 
 
 document.getElementById("markAllRead").onclick = ()=>{
@@ -1251,6 +2927,32 @@ document.getElementById("markAllRead").onclick = ()=>{
         saveReadSet(s);
         renderList();
         showToast("已全部标记已读");
+    }
+};
+
+
+//跳转到书签：一键回到保存过阅读位置的文章
+document.getElementById("jumpBookmarkBtn").onclick = function(){
+    const raw = localStorage.getItem(BKMK_KEY);
+    if(!raw){
+        showToast("暂无书签，请先在文章内点“🔖存书签”");
+        return;
+    }
+    try{
+        const b = JSON.parse(raw);
+        const idx = articleData.findIndex(x=>x.title === (b.aid.split("_").slice(1).join("_")));
+        if(idx === -1){
+            showToast("书签对应文章已不存在");
+            return;
+        }
+        //把书签位置写入滚动记录，交由打开流程做懒加载补齐与定位
+        const pos = getScrollPos();
+        pos[b.aid] = b.scrollTop || 0;
+        saveScrollPos(pos);
+        openArticleByAid(b.aid);
+        showToast("已跳转到书签位置");
+    }catch(e){
+        showToast("书签数据异常");
     }
 };
 
